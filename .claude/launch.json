@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cesa",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "cesa-site", "run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}

@@ -1,0 +1,408 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <style>
+    body { margin: 0; background: #0a0716; font-family: "Zen Kaku Gothic New", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #ff8fbc; text-decoration: none; }
+    a:hover { color: #ffd7e8; }
+    h1, h2, h3 { font-family: "Shippori Mincho B1", Georgia, serif; margin: 0; text-wrap: pretty; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+    .petal { position: absolute; top: -60px; border-radius: 100% 0 100% 0; animation-name: fall; animation-timing-function: linear; animation-iteration-count: infinite; }
+    @keyframes fall {
+      0%   { transform: translate3d(0, -80px, 0) rotate(0deg); }
+      100% { transform: translate3d(-160px, 1040px, 0) rotate(460deg); }
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translate3d(0, 46px, 0); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes glow {
+      0%, 100% { opacity: .55; }
+      50%      { opacity: .85; }
+    }
+    @keyframes marquee {
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(-50%, 0, 0); }
+    }
+    .rise { animation: rise .95s cubic-bezier(.2,.75,.2,1) both; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; background: #0a0716; color: #f7efe6; overflow: hidden;">
+
+  <div style="position: relative; height: 940px; overflow: hidden; background: radial-gradient(760px 520px at 79% 14%, rgba(255,222,238,.20), rgba(255,222,238,0) 62%), radial-gradient(1150px 760px at 16% -6%, rgba(126,74,168,.42), rgba(126,74,168,0) 66%), linear-gradient(178deg, #080513 0%, #150e2b 44%, #26183a 76%, #37223f 100%);">
+
+    <svg style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .07; mix-blend-mode: overlay; pointer-events: none;" aria-hidden="true">
+      <filter id="grainHero"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3"></feTurbulence></filter>
+      <rect width="100%" height="100%" filter="url(#grainHero)"></rect>
+    </svg>
+
+    <div style="position: absolute; top: 96px; right: 168px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle at 38% 34%, #fffaf2, #f6e4cf 52%, #e9c9ad 74%, #d9b498 100%); box-shadow: 0 0 120px 40px rgba(255,226,205,.20), 0 0 260px 90px rgba(255,180,210,.12); animation: glow 7s ease-in-out infinite;"></div>
+
+    <svg viewBox="0 0 700 480" style="position: absolute; top: -20px; left: -30px; width: 760px; height: 520px; pointer-events: none;" aria-hidden="true">
+      <g stroke="#0d0918" fill="none" stroke-linecap="round">
+        <path d="M-20 8 C 96 44, 158 52, 224 116 C 268 158, 292 214, 334 250 C 372 282, 424 292, 470 300" stroke-width="13"></path>
+        <path d="M150 78 C 168 122, 156 168, 128 206" stroke-width="7"></path>
+        <path d="M236 128 C 286 128, 320 104, 344 66" stroke-width="6"></path>
+        <path d="M300 216 C 316 262, 306 306, 276 340" stroke-width="6"></path>
+        <path d="M394 276 C 430 250, 470 244, 512 250" stroke-width="5"></path>
+        <path d="M96 40 C 108 74, 100 100, 78 120" stroke-width="5"></path>
+      </g>
+      <g>
+        <circle cx="128" cy="206" r="13" fill="#ffc4dd" opacity=".92"></circle>
+        <circle cx="146" cy="192" r="9" fill="#ffe3ef" opacity=".85"></circle>
+        <circle cx="112" cy="190" r="8" fill="#ff9cc4" opacity=".8"></circle>
+        <circle cx="344" cy="66" r="12" fill="#ffd0e4" opacity=".9"></circle>
+        <circle cx="362" cy="80" r="8" fill="#ff9cc4" opacity=".78"></circle>
+        <circle cx="330" cy="48" r="7" fill="#fff1f6" opacity=".8"></circle>
+        <circle cx="276" cy="340" r="13" fill="#ffc4dd" opacity=".9"></circle>
+        <circle cx="258" cy="326" r="8" fill="#ffe3ef" opacity=".8"></circle>
+        <circle cx="292" cy="356" r="7" fill="#ff9cc4" opacity=".75"></circle>
+        <circle cx="512" cy="250" r="11" fill="#ffd0e4" opacity=".88"></circle>
+        <circle cx="530" cy="262" r="7" fill="#ff9cc4" opacity=".72"></circle>
+        <circle cx="78" cy="120" r="11" fill="#ffc4dd" opacity=".85"></circle>
+        <circle cx="62" cy="134" r="7" fill="#fff1f6" opacity=".75"></circle>
+        <circle cx="470" cy="300" r="9" fill="#ffe3ef" opacity=".8"></circle>
+        <circle cx="206" cy="100" r="7" fill="#ff9cc4" opacity=".7"></circle>
+        <circle cx="266" cy="176" r="8" fill="#ffd0e4" opacity=".72"></circle>
+      </g>
+    </svg>
+
+    <div style="position: absolute; inset: 0; pointer-events: none;">
+      <sc-for list="{{petals}}" as="p" hint-placeholder-count="16">
+        <div class="petal" style="{{p.style}}"></div>
+      </sc-for>
+    </div>
+
+    <div style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 34px 72px 0;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="18.5" fill="none" stroke="#ff8fbc" stroke-width="1.4" opacity=".7"></circle>
+          <g fill="#ffc4dd">
+            <ellipse cx="20" cy="11.5" rx="4.1" ry="6.2"></ellipse>
+            <ellipse cx="20" cy="28.5" rx="4.1" ry="6.2"></ellipse>
+            <ellipse cx="11.5" cy="20" rx="6.2" ry="4.1"></ellipse>
+            <ellipse cx="28.5" cy="20" rx="6.2" ry="4.1"></ellipse>
+          </g>
+          <circle cx="20" cy="20" r="2.6" fill="#e8b45c"></circle>
+        </svg>
+        <div style="display: flex; flex-direction: column; gap: 1px;">
+          <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 19px; letter-spacing: .26em; color: #f7efe6;">CESA</span>
+          <span class="mono" style="font-size: 9px; letter-spacing: .22em; color: #b6a9c9;">VIT · COMP ENGG</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 38px;">
+        <a href="#" style="color: #f7efe6; font-size: 14px; letter-spacing: .06em;">Home</a>
+        <a href="#" style="color: #cbbedd; font-size: 14px; letter-spacing: .06em;">About</a>
+        <a href="#" style="color: #cbbedd; font-size: 14px; letter-spacing: .06em;">Events</a>
+        <a href="#" style="color: #cbbedd; font-size: 14px; letter-spacing: .06em;">Team</a>
+        <a href="#" style="color: #cbbedd; font-size: 14px; letter-spacing: .06em;">Blog</a>
+        <a href="#" style="display: inline-flex; align-items: center; height: 44px; padding: 0 26px; border: 1px solid rgba(255,143,188,.55); border-radius: 999px; color: #ffd7e8; font-size: 14px; letter-spacing: .1em; background: rgba(255,143,188,.08);">Join CESA</a>
+      </div>
+    </div>
+
+    <div style="position: absolute; right: 56px; top: 300px; display: flex; flex-direction: column; align-items: center; gap: 22px;">
+      <div style="width: 1px; height: 120px; background: linear-gradient(180deg, rgba(255,143,188,0), rgba(255,143,188,.6));"></div>
+      <div style="writing-mode: vertical-rl; font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 22px; letter-spacing: .5em; color: rgba(255,215,232,.62);">夜桜</div>
+      <div style="width: 1px; height: 120px; background: linear-gradient(180deg, rgba(255,143,188,.6), rgba(255,143,188,0));"></div>
+    </div>
+
+    <div style="position: relative; padding: 118px 72px 0; max-width: 1000px;">
+      <div class="rise mono" style="animation-delay: .05s; display: flex; align-items: center; gap: 14px; font-size: 11px; letter-spacing: .34em; color: #e8b45c; margin-bottom: 32px;">
+        <span style="display: inline-block; width: 38px; height: 1px; background: #e8b45c;"></span>
+        COMPUTER ENGINEERING STUDENTS&#39; ASSOCIATION
+      </div>
+
+      <h1 style="font-size: 130px; line-height: .93; font-weight: 800; letter-spacing: -.03em;">
+        <span class="rise" style="display: block; animation-delay: .16s;">Code.</span>
+        <span class="rise" style="display: block; margin-left: 92px; animation-delay: .3s; color: #e9dcf2;">Compete.</span>
+        <span class="rise" style="display: block; margin-left: 196px; animation-delay: .44s;"><span style="-webkit-background-clip: text; background-clip: text; color: transparent; background-image: linear-gradient(96deg, #ffe3ef 4%, {{accent}} 52%, #e8b45c 96%);">Conquer.</span></span>
+      </h1>
+
+      <p class="rise" style="animation-delay: .58s; margin: 38px 0 0; max-width: 505px; font-size: 18px; line-height: 1.75; font-weight: 300; color: #c8bad9;">
+        The official body of the Computer Engineering Department at VIT — a place to build things that work, ship them in public, and drag each other forward.
+      </p>
+
+      <div class="rise" style="animation-delay: .7s; display: flex; align-items: center; gap: 18px; margin-top: 42px;">
+        <a href="#" style="display: inline-flex; align-items: center; gap: 12px; height: 58px; padding: 0 34px; border-radius: 999px; background: {{accent}}; color: #1a0a14; font-size: 15px; font-weight: 700; letter-spacing: .04em; box-shadow: 0 18px 44px -16px rgba(255,143,188,.75);">
+          Explore Events
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a0a14" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+        <a href="#" style="display: inline-flex; align-items: center; height: 58px; padding: 0 32px; border-radius: 999px; border: 1px solid rgba(247,239,230,.26); color: #f7efe6; font-size: 15px; letter-spacing: .04em;">Meet the Committee</a>
+      </div>
+    </div>
+
+    <div style="position: absolute; left: 72px; right: 72px; bottom: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid rgba(247,239,230,.14);">
+      <div style="display: flex; align-items: baseline; gap: 16px; padding: 26px 0;">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 40px; color: #ffd7e8;">06</span>
+        <span class="mono" style="font-size: 11px; letter-spacing: .2em; color: #b6a9c9;">EVENTS THIS TENURE</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 16px; padding: 26px 0 26px 40px; border-left: 1px solid rgba(247,239,230,.14);">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 40px; color: #ffd7e8;">06</span>
+        <span class="mono" style="font-size: 11px; letter-spacing: .2em; color: #b6a9c9;">TEAMS, HEAD &amp; CO-HEAD</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 16px; padding: 26px 0 26px 40px; border-left: 1px solid rgba(247,239,230,.14);">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 40px; color: #ffd7e8;">01</span>
+        <span class="mono" style="font-size: 11px; letter-spacing: .2em; color: #b6a9c9;">FLAGSHIP — PLETHORA</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: relative; overflow: hidden; border-top: 1px solid rgba(255,143,188,.2); border-bottom: 1px solid rgba(255,143,188,.2); background: #0d0819; padding: 20px 0;">
+    <div style="display: flex; width: 200%; animation: marquee 26s linear infinite;">
+      <div class="mono" style="display: flex; align-items: center; gap: 38px; width: 50%; flex-shrink: 0; font-size: 13px; letter-spacing: .3em; color: rgba(247,239,230,.5); white-space: nowrap;">
+        <span>CODE</span><span style="color: #ff8fbc;">桜</span><span>COMPETE</span><span style="color: #e8b45c;">桜</span><span>CONQUER</span><span style="color: #ff8fbc;">桜</span><span>PLETHORA</span><span style="color: #e8b45c;">桜</span><span>AI / ML</span><span style="color: #ff8fbc;">桜</span><span>HACKATHONS</span><span style="color: #e8b45c;">桜</span><span>WORKSHOPS</span><span style="color: #ff8fbc;">桜</span>
+      </div>
+      <div class="mono" style="display: flex; align-items: center; gap: 38px; width: 50%; flex-shrink: 0; font-size: 13px; letter-spacing: .3em; color: rgba(247,239,230,.5); white-space: nowrap;">
+        <span>CODE</span><span style="color: #ff8fbc;">桜</span><span>COMPETE</span><span style="color: #e8b45c;">桜</span><span>CONQUER</span><span style="color: #ff8fbc;">桜</span><span>PLETHORA</span><span style="color: #e8b45c;">桜</span><span>AI / ML</span><span style="color: #ff8fbc;">桜</span><span>HACKATHONS</span><span style="color: #e8b45c;">桜</span><span>WORKSHOPS</span><span style="color: #ff8fbc;">桜</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: relative; padding: 126px 72px 112px; background: linear-gradient(180deg, #0d0819 0%, #120c22 100%); overflow: hidden;">
+    <div style="position: absolute; right: -110px; top: 60px; font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 460px; line-height: .8; color: rgba(255,143,188,.045); pointer-events: none;">桜</div>
+
+    <div style="position: relative; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 96px;">
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <span class="mono" style="font-size: 11px; letter-spacing: .34em; color: #e8b45c;">01 — ABOUT</span>
+        <div style="width: 54px; height: 2px; background: {{accent}};"></div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.8; color: #9d90b3; font-weight: 300;">Focused on AI/ML and core computing domains.</p>
+      </div>
+
+      <div>
+        <h2 style="font-size: 54px; line-height: 1.24; font-weight: 600; letter-spacing: -.015em; color: #f7efe6; max-width: 840px;">
+          We turn a department into a <span style="color: #ffb3d0;">community</span> — coding competitions, AI/ML challenges, workshops and hackathons that leave people with something they built.
+        </h2>
+        <p style="margin: 38px 0 0; max-width: 760px; font-size: 17px; line-height: 1.9; font-weight: 300; color: #c0b2d3;">
+          Our flagship, <strong style="color: #f7efe6; font-weight: 500;">Plethora</strong>, brings all of it together under one roof each year. Guided by our motto — Code. Compete. Conquer. — we set out to shape the next generation of tech leaders, one shipped project at a time.
+        </p>
+      </div>
+    </div>
+
+    <div style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; margin-top: 88px;">
+      <div style="padding: 34px 30px 38px; border: 1px solid rgba(247,239,230,.11); border-radius: 4px; background: rgba(255,255,255,.022); display: flex; flex-direction: column; gap: 20px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff8fbc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z"></path></svg>
+        <h3 style="font-size: 22px; font-weight: 600; color: #f7efe6;">Fast-paced</h3>
+        <p style="margin: 0; font-size: 14px; line-height: 1.75; color: #a294ba; font-weight: 300;">Hands-on events and sprints, not lecture halls.</p>
+      </div>
+      <div style="padding: 34px 30px 38px; border: 1px solid rgba(247,239,230,.11); border-radius: 4px; background: rgba(255,255,255,.022); display: flex; flex-direction: column; gap: 20px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b45c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r="1"></circle></svg>
+        <h3 style="font-size: 22px; font-weight: 600; color: #f7efe6;">Outcome-first</h3>
+        <p style="margin: 0; font-size: 14px; line-height: 1.75; color: #a294ba; font-weight: 300;">Build real, useful projects worth showing.</p>
+      </div>
+      <div style="padding: 34px 30px 38px; border: 1px solid rgba(247,239,230,.11); border-radius: 4px; background: rgba(255,255,255,.022); display: flex; flex-direction: column; gap: 20px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff8fbc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2.6"></circle><circle cx="5" cy="18" r="2.6"></circle><circle cx="19" cy="18" r="2.6"></circle><path d="M10.6 6.9L6.4 15.6M13.4 6.9l4.2 8.7M7.6 18h8.8"></path></svg>
+        <h3 style="font-size: 22px; font-weight: 600; color: #f7efe6;">Community</h3>
+        <p style="margin: 0; font-size: 14px; line-height: 1.75; color: #a294ba; font-weight: 300;">Peer-led learning — seniors teaching juniors.</p>
+      </div>
+      <div style="padding: 34px 30px 38px; border: 1px solid rgba(247,239,230,.11); border-radius: 4px; background: rgba(255,255,255,.022); display: flex; flex-direction: column; gap: 20px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b45c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7l4.5 5L5 17"></path><path d="M12.5 17H19"></path></svg>
+        <h3 style="font-size: 22px; font-weight: 600; color: #f7efe6;">Tooling</h3>
+        <p style="margin: 0; font-size: 14px; line-height: 1.75; color: #a294ba; font-weight: 300;">Modern stacks and workflows, used properly.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: relative; padding: 112px 72px; background: radial-gradient(900px 500px at 88% 30%, rgba(232,180,92,.14), rgba(232,180,92,0) 62%), linear-gradient(180deg, #120c22 0%, #1a1030 100%); overflow: hidden;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 50px;">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <span class="mono" style="font-size: 11px; letter-spacing: .34em; color: #e8b45c;">02 — WHAT&#39;S NEXT</span>
+        <h2 style="font-size: 56px; font-weight: 600; letter-spacing: -.02em; color: #f7efe6;">Upcoming</h2>
+      </div>
+      <a href="#" class="mono" style="font-size: 12px; letter-spacing: .2em; color: #cbbedd;">ALL EVENTS →</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); border: 1px solid rgba(255,143,188,.24); border-radius: 6px; overflow: hidden; background: rgba(10,6,20,.62);">
+      <div style="padding: 54px 54px 50px; display: flex; flex-direction: column; gap: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: {{accent}};"></span>
+          <span class="mono" style="font-size: 11px; letter-spacing: .26em; color: {{accent}};">REGISTRATIONS OPEN</span>
+        </div>
+        <h3 style="font-size: 60px; line-height: 1.05; font-weight: 800; letter-spacing: -.03em; color: #f7efe6;">AgentX<br />Summit</h3>
+        <p style="margin: 0; max-width: 460px; font-size: 16px; line-height: 1.85; font-weight: 300; color: #b9aacd;">
+          A hands-on build session on intelligent agents powered by large language models — LangChain, APIs, tools and memory, with mentors on the floor.
+        </p>
+        <div style="display: flex; gap: 44px; padding-top: 6px;">
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <span class="mono" style="font-size: 10px; letter-spacing: .22em; color: #8d80a4;">DATE</span>
+            <span style="font-size: 16px; color: #f7efe6;">Jan 28 · 4:00–6:30 PM</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <span class="mono" style="font-size: 10px; letter-spacing: .22em; color: #8d80a4;">VENUE</span>
+            <span style="font-size: 16px; color: #f7efe6;">VIT — L06</span>
+          </div>
+        </div>
+        <a href="https://forms.gle/rcxuDay4gmfJx5vi7" style="display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; height: 56px; padding: 0 40px; margin-top: 8px; border-radius: 999px; background: {{accent}}; color: #1a0a14; font-size: 15px; font-weight: 700; letter-spacing: .04em;">Register now</a>
+      </div>
+
+      <div style="position: relative; padding: 54px 46px; border-left: 1px solid rgba(255,143,188,.18); background: linear-gradient(160deg, rgba(255,143,188,.07), rgba(232,180,92,.05)); display: flex; flex-direction: column; justify-content: center; gap: 28px; overflow: hidden;">
+        <svg viewBox="0 0 200 200" style="position: absolute; right: -30px; bottom: -30px; width: 260px; height: 260px; opacity: .13;" aria-hidden="true">
+          <g fill="#ffc4dd">
+            <ellipse cx="100" cy="58" rx="20" ry="31"></ellipse>
+            <ellipse cx="100" cy="142" rx="20" ry="31"></ellipse>
+            <ellipse cx="58" cy="100" rx="31" ry="20"></ellipse>
+            <ellipse cx="142" cy="100" rx="31" ry="20"></ellipse>
+          </g>
+          <circle cx="100" cy="100" r="13" fill="#e8b45c"></circle>
+        </svg>
+        <span class="mono" style="position: relative; font-size: 10px; letter-spacing: .26em; color: #b6a9c9;">STARTS IN</span>
+        <div style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 20px 0; border: 1px solid rgba(247,239,230,.14); border-radius: 4px; background: rgba(10,6,20,.5);">
+            <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 34px; color: #ffd7e8;">12</span>
+            <span class="mono" style="font-size: 9px; letter-spacing: .16em; color: #8d80a4;">DAYS</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 20px 0; border: 1px solid rgba(247,239,230,.14); border-radius: 4px; background: rgba(10,6,20,.5);">
+            <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 34px; color: #ffd7e8;">06</span>
+            <span class="mono" style="font-size: 9px; letter-spacing: .16em; color: #8d80a4;">HRS</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 20px 0; border: 1px solid rgba(247,239,230,.14); border-radius: 4px; background: rgba(10,6,20,.5);">
+            <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 34px; color: #ffd7e8;">41</span>
+            <span class="mono" style="font-size: 9px; letter-spacing: .16em; color: #8d80a4;">MIN</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 20px 0; border: 1px solid rgba(247,239,230,.14); border-radius: 4px; background: rgba(10,6,20,.5);">
+            <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 34px; color: #ffd7e8;">09</span>
+            <span class="mono" style="font-size: 9px; letter-spacing: .16em; color: #8d80a4;">SEC</span>
+          </div>
+        </div>
+        <p style="position: relative; margin: 0; font-size: 13px; line-height: 1.7; color: #9d90b3; font-weight: 300;">Seats are capped. Bring a laptop with Python installed.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 112px 72px; background: #100a1f;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 50px;">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <span class="mono" style="font-size: 11px; letter-spacing: .34em; color: #e8b45c;">03 — THE COMMITTEE</span>
+        <h2 style="font-size: 56px; font-weight: 600; letter-spacing: -.02em; color: #f7efe6;">Six teams, one association</h2>
+      </div>
+      <a href="#" class="mono" style="font-size: 12px; letter-spacing: .2em; color: #cbbedd;">MEET EVERYONE →</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+      <div style="padding: 32px 30px; border: 1px solid rgba(247,239,230,.1); border-radius: 4px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 26px; color: #ffb3d0;">Technical</span>
+        <div style="width: 30px; height: 1px; background: rgba(255,143,188,.5);"></div>
+        <span style="font-size: 14px; color: #c0b2d3; font-weight: 300;">Prashi Rawal · Rohit Soneji</span>
+      </div>
+      <div style="padding: 32px 30px; border: 1px solid rgba(247,239,230,.1); border-radius: 4px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 26px; color: #ffb3d0;">Event</span>
+        <div style="width: 30px; height: 1px; background: rgba(255,143,188,.5);"></div>
+        <span style="font-size: 14px; color: #c0b2d3; font-weight: 300;">Ishika Bhute · Soumitra Rajguru</span>
+      </div>
+      <div style="padding: 32px 30px; border: 1px solid rgba(247,239,230,.1); border-radius: 4px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 26px; color: #ffb3d0;">Creative</span>
+        <div style="width: 30px; height: 1px; background: rgba(255,143,188,.5);"></div>
+        <span style="font-size: 14px; color: #c0b2d3; font-weight: 300;">Sudha Maurya · Siddhi Naik</span>
+      </div>
+      <div style="padding: 32px 30px; border: 1px solid rgba(247,239,230,.1); border-radius: 4px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 26px; color: #ffb3d0;">Publicity</span>
+        <div style="width: 30px; height: 1px; background: rgba(255,143,188,.5);"></div>
+        <span style="font-size: 14px; color: #c0b2d3; font-weight: 300;">Bhavika Yashwantrao · Tejas Dhanvi</span>
+      </div>
+      <div style="padding: 32px 30px; border: 1px solid rgba(247,239,230,.1); border-radius: 4px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 26px; color: #ffb3d0;">Media</span>
+        <div style="width: 30px; height: 1px; background: rgba(255,143,188,.5);"></div>
+        <span style="font-size: 14px; color: #c0b2d3; font-weight: 300;">Yash Salunkhe · Ayush Kamble</span>
+      </div>
+      <div style="padding: 32px 30px; border: 1px solid rgba(247,239,230,.1); border-radius: 4px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 26px; color: #ffb3d0;">Documentation</span>
+        <div style="width: 30px; height: 1px; background: rgba(255,143,188,.5);"></div>
+        <span style="font-size: 14px; color: #c0b2d3; font-weight: 300;">Devanshi Mahajan · Mayuri Kamath</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: relative; padding: 118px 72px 0; background: linear-gradient(180deg, #100a1f 0%, #1d1233 60%, #2a1838 100%); overflow: hidden;">
+    <svg viewBox="0 0 1440 260" style="position: absolute; left: 0; bottom: 210px; width: 1440px; height: 260px; opacity: .5;" aria-hidden="true">
+      <path d="M0 190 C 220 120, 340 250, 560 176 C 780 104, 900 226, 1120 160 C 1280 112, 1360 168, 1440 148" fill="none" stroke="rgba(255,143,188,.28)" stroke-width="1.2"></path>
+      <path d="M0 220 C 240 150, 360 274, 600 206 C 840 138, 960 250, 1200 190 C 1330 158, 1390 196, 1440 184" fill="none" stroke="rgba(232,180,92,.2)" stroke-width="1.2"></path>
+    </svg>
+
+    <div style="position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 28px; padding-bottom: 104px;">
+      <span class="mono" style="font-size: 11px; letter-spacing: .34em; color: #e8b45c;">04 — JOIN US</span>
+      <h2 style="font-size: 82px; line-height: 1.06; font-weight: 800; letter-spacing: -.035em; color: #f7efe6; max-width: 900px;">
+        The best thing you build this year<br />starts with showing up.
+      </h2>
+      <p style="margin: 0; max-width: 520px; font-size: 17px; line-height: 1.8; font-weight: 300; color: #b9aacd;">Open to every Computer Engineering student at VIT. No prerequisites beyond curiosity.</p>
+      <a href="#" style="display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 40px; margin-top: 6px; border-radius: 999px; background: {{accent}}; color: #1a0a14; font-size: 15px; font-weight: 700; letter-spacing: .04em; box-shadow: 0 20px 50px -18px rgba(255,143,188,.8);">
+        Become a member
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a0a14" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"></path><path d="M12 5l7 7-7 7"></path></svg>
+      </a>
+    </div>
+
+    <div style="position: relative; display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 48px; padding: 54px 0 38px; border-top: 1px solid rgba(247,239,230,.13);">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; align-items: center; gap: 13px;">
+          <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="18.5" fill="none" stroke="#ff8fbc" stroke-width="1.4" opacity=".7"></circle>
+            <g fill="#ffc4dd"><ellipse cx="20" cy="11.5" rx="4.1" ry="6.2"></ellipse><ellipse cx="20" cy="28.5" rx="4.1" ry="6.2"></ellipse><ellipse cx="11.5" cy="20" rx="6.2" ry="4.1"></ellipse><ellipse cx="28.5" cy="20" rx="6.2" ry="4.1"></ellipse></g>
+            <circle cx="20" cy="20" r="2.6" fill="#e8b45c"></circle>
+          </svg>
+          <span style="font-family: 'Shippori Mincho B1', Georgia, serif; font-size: 17px; letter-spacing: .26em; color: #f7efe6;">CESA</span>
+        </div>
+        <p style="margin: 0; max-width: 300px; font-size: 14px; line-height: 1.8; color: #9d90b3; font-weight: 300;">Computer Engineering Students&#39; Association. Building, learning, and growing together.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <span class="mono" style="font-size: 10px; letter-spacing: .24em; color: #7d7192;">EXPLORE</span>
+        <a href="#" style="color: #c0b2d3; font-size: 14px;">About</a>
+        <a href="#" style="color: #c0b2d3; font-size: 14px;">Events</a>
+        <a href="#" style="color: #c0b2d3; font-size: 14px;">Team</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <span class="mono" style="font-size: 10px; letter-spacing: .24em; color: #7d7192;">COMMUNITY</span>
+        <a href="#" style="color: #c0b2d3; font-size: 14px;">Blog</a>
+        <a href="#" style="color: #c0b2d3; font-size: 14px;">Resources</a>
+        <a href="#" style="color: #c0b2d3; font-size: 14px;">Code of Conduct</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <span class="mono" style="font-size: 10px; letter-spacing: .24em; color: #7d7192;">FOLLOW</span>
+        <a href="https://www.instagram.com/cesa.vit" style="color: #c0b2d3; font-size: 14px;">Instagram</a>
+        <a href="https://www.linkedin.com/company/cesa-vit/" style="color: #c0b2d3; font-size: 14px;">LinkedIn</a>
+        <a href="https://www.youtube.com/@cesavit153" style="color: #c0b2d3; font-size: 14px;">YouTube</a>
+      </div>
+    </div>
+
+    <div style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 24px 0 40px; border-top: 1px solid rgba(247,239,230,.09);">
+      <span class="mono" style="font-size: 11px; letter-spacing: .14em; color: #7d7192;">© 2026 CESA · VIT</span>
+      <span class="mono" style="font-size: 11px; letter-spacing: .14em; color: #7d7192;">CODE. COMPETE. CONQUER.</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":1440,"height":4180},"accent":{"editor":"color","default":"#ff8fbc","options":["#ff8fbc","#e8b45c","#ff6b8b","#c9a4ff"]},"petalCount":{"editor":"int","default":16,"min":0,"max":30}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var accent = this.props.accent || '#ff8fbc';
+    var raw = this.props.petalCount == null ? 16 : this.props.petalCount;
+    var n = Math.max(0, Math.min(30, raw));
+    var petals = [];
+    for (var i = 0; i < n; i++) {
+      var left = (i * 37) % 100;
+      var size = 9 + ((i * 5) % 13);
+      var dur = 12 + ((i * 3) % 10);
+      var delay = -((i * 1.9) % 15);
+      var op = 0.3 + ((i * 7) % 6) / 12;
+      petals.push({
+        style: 'left:' + left + '%;'
+          + 'width:' + size + 'px;height:' + size + 'px;'
+          + 'background:linear-gradient(140deg,#ffe3ef,' + accent + ');'
+          + 'animation-duration:' + dur + 's;'
+          + 'animation-delay:' + delay.toFixed(2) + 's;'
+          + 'opacity:' + op.toFixed(2) + ';'
+      });
+    }
+    return { accent: accent, petals: petals };
+  }
+}
+</script>
+</body>
+</html>
