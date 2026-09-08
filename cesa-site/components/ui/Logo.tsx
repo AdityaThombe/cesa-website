@@ -25,9 +25,9 @@ export function BlossomMark({ size = 36 }: { size?: number }) {
   );
 }
 
-export default function Logo() {
+export default function Logo({ className = "text-washi" }: { className?: string }) {
   return (
-    <a href="/" className="flex items-center gap-3.5 text-washi">
+    <a href="/" className={`flex items-center gap-3.5 ${className}`}>
       <BlossomMark />
       <span className="flex flex-col gap-px">
         <span className="font-display text-[1.1875rem] tracking-[0.26em]">CESA</span>

@@ -1,34 +1,46 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Reggae_One, Zen_Kaku_Gothic_New } from "next/font/google";
+import localFont from "next/font/local";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
 /**
- * Display: Reggae One. Thick brush-derived strokes with ragged, chiselled
- * edges — the closest thing on Google Fonts to Edo, and unlike Edo it is
- * licensed for commercial use, which matters for an institutional site.
+ * Display: "The Last Shuriken" — the Figma file's own heading font,
+ * self-hosted from the file the user provided (app/fonts/TheLastShuriken.ttf).
  *
- * One weight (400), which is already very heavy. Brush faces have no bold;
- * synthesising one would clog the counters and kill the stroke texture.
+ * ⚠ LICENSE: this face is personal-use-only. Its Readme.txt states a 100x
+ * standard-license penalty for violating that, and this is a public
+ * institutional site — commercial/promotional use by the foundry's own
+ * definition. Flagged three times across the build of this site; the user
+ * has explicitly chosen to proceed anyway, aware of the terms. If that
+ * changes, either replace this with a purchased commercial license
+ * (arterfakproject.com) or revert to Reggae One (still commercially
+ * licensed, was the display font before this).
+ *
+ * Falls back to Reggae One's own stack, not a generic serif — if this font
+ * ever fails to load, degrading straight to Impact/sans-serif would be a
+ * much bigger visual jump than degrading to a face in the same brush family.
  */
-const reggae = Reggae_One({
-  subsets: ["latin"],
-  weight: ["400"],
+const shuriken = localFont({
+  src: "./fonts/TheLastShuriken.ttf",
   variable: "--font-reggae",
   display: "swap",
+  fallback: ["Impact", "Arial Black", "sans-serif"],
 });
 
 /**
- * Body: Zen Kaku Gothic New. Quiet enough to let the brush headline carry the
- * page, and it keeps the Japanese thread without costume.
- * Latin subset only — the decorative kanji (花見) fall back to the system CJK
- * face rather than pulling megabytes for three glyphs.
+ * Body: Inter, at the user's explicit request, replacing Zen Kaku Gothic New.
+ * Worth knowing what that trades away: Zen Kaku was chosen specifically to
+ * keep a quiet Japanese thread running under the brush headline without
+ * costume; Inter is a neutral, purely functional UI sans with none of that
+ * connection. The decorative kanji (花見) still fall back to the system CJK
+ * face either way — Inter doesn't cover those glyphs.
  */
-const zen = Zen_Kaku_Gothic_New({
+const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
-  variable: "--font-zen",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -56,7 +68,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${reggae.variable} ${zen.variable} ${jetbrains.variable}`}
+      className={`${shuriken.variable} ${inter.variable} ${jetbrains.variable}`}
     >
       <body>
         <SmoothScroll>{children}</SmoothScroll>

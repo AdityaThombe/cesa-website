@@ -1,14 +1,20 @@
 import ParallaxScene from "@/components/scene/ParallaxScene";
 import PetalCanvas from "@/components/scene/PetalCanvas";
-import Button, { ArrowRight } from "@/components/ui/Button";
-import Logo from "@/components/ui/Logo";
 
-const NAV = ["Home", "About", "Events", "Team", "Blog"];
-
-const STATS = [
-  { figure: "06", label: "EVENTS THIS TENURE" },
-  { figure: "06", label: "TEAMS, HEAD & CO-HEAD" },
-  { figure: "01", label: "FLAGSHIP — PLETHORA" },
+/**
+ * Figma node 9:26 (file GCeABSi7E0WdNDYKKObWS9), "Nav-bar button" group.
+ *
+ * `w` is each pill's own width as a fraction of the 1920 frame, because they
+ * are NOT uniform in the design: About Us is built from two 140px NAV-BUTTON
+ * copies butted together (nodes 9:46 + 9:47, spanning 1358..1570 = 212px),
+ * while the rest are single pills. Rendering all four at one width is the
+ * single most visible way this nav reads as "not the design".
+ */
+const NAV = [
+  { label: "Home", href: "#", w: "7.0313vw" },
+  { label: "About Us", href: "#about", w: "11.0417vw" },
+  { label: "Events", href: "#events", w: "7.2917vw" },
+  { label: "Team", href: "#team", w: "7.2917vw" },
 ];
 
 export default function Hero() {
@@ -16,106 +22,123 @@ export default function Hero() {
     <ParallaxScene>
       <PetalCanvas />
 
-      {/* Hanami — blossom viewing. Set vertically in the right margin.
-          The kanji fall back to a system CJK face: pulling the Japanese subset
-          of the display font would cost megabytes for two glyphs. */}
-      <div
-        aria-hidden="true"
-        className="absolute right-14 top-[38%] hidden flex-col items-center gap-6 xl:flex"
-      >
-        <span className="h-28 w-px bg-gradient-to-b from-transparent to-washi/60" />
-        <span
-          className="font-display text-[1.375rem] tracking-[0.5em] text-washi/70"
-          style={{ writingMode: "vertical-rl" }}
-        >
-          花見
-        </span>
-        <span className="h-28 w-px bg-gradient-to-b from-washi/60 to-transparent" />
-      </div>
-
-      {/* A single flex column owning the full height: header, copy, stat strip.
-          The strip used to be absolutely positioned while the copy sat in flow,
-          so on shorter viewports the buttons landed on top of it. Stacking them
-          in one column makes that collision impossible at any height. */}
+      {/* A single flex column owning the full height: header, then the
+          headline dropped into the space the courtyard's stone path leaves
+          open on the left, matching the Figma frame's own text box. */}
       <div className="relative flex h-full flex-col">
-        <header className="flex shrink-0 items-center justify-between px-18 pt-9">
-          <Logo />
-          <nav className="hidden items-center gap-9 lg:flex">
-            {NAV.map((item, i) => (
+        {/* Torn-paper strip behind the whole nav row (Figma node 9:41,
+            "Nav-bar" group, newly split out from the header in the latest
+            revision) — the same torn-edge asset the About section uses,
+            flipped so its ragged edge hangs down over the top of the scene
+            like a strip of paper glued along the frame's top edge. */}
+        <img
+          src="/scene/torn-edge.webp"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 top-0 w-full"
+          style={{ height: "4.9479vw", minHeight: "48px", transform: "scaleY(-1)" }}
+        />
+
+        {/* The CESA wordmark badge (Figma "Cesa-logo", node 9:54) — its own
+            white card, placed flush in the top-left corner so its white
+            background sits on the cream torn-paper strip rather than the
+            dark sky (which is what made the black wordmark unreadable when
+            it was chroma-keyed to transparent and floated over the purple
+            gradient). Figma pins it at a NEGATIVE top (-39px of the 1920
+            frame), poking up above the strip's own top edge — reproduced
+            here with the same fraction. */}
+        <a
+          href="/"
+          aria-label="CESA home"
+          className="absolute left-0 top-[-2.03vw] z-10 block"
+          style={{ width: "10.9375vw", minWidth: "88px" }}
+        >
+          <picture>
+            <source srcSet="/scene/logo-badge.avif" type="image/avif" />
+            <img
+              src="/scene/logo-badge.webp"
+              alt="CESA"
+              // No border-radius or box-shadow: both paint against the img's
+              // rectangular BOX, and this is a transparent cut-out, so they
+              // draw a hard-edged panel around a logo that has no panel in
+              // the design. Figma gives this node no effects at all.
+              className="w-full"
+            />
+          </picture>
+        </a>
+
+        {/* Figma pins the pills at top 7-9px of the 1920 frame — right up
+            against the strip's top edge. Tailwind's pt-9 is a fixed 36px no
+            matter the viewport, which sat the whole row ~27px too low and
+            dropped it out of the paper strip onto the sky. */}
+        <header
+          className="relative flex shrink-0 items-center justify-end"
+          style={{ paddingRight: "2.0833vw", paddingTop: "0.4688vw" }}
+        >
+          {/* Each item sits on its own torn-paper pill (Figma's "NAV-BUTTON"
+              asset), sized as a fraction of the 1920 frame like every other
+              box on this page: per-item width from NAV above, 67px tall ->
+              3.4896vw, 34px text -> 1.7708vw. These use max() rather than
+              clamp(): an upper bound in the clamp stopped the type growing at
+              exactly the width the design was drawn for, so at 1920 the nav
+              read 22px against Figma's 34px. */}
+          <nav className="hidden items-center lg:flex" style={{ gap: "0.5vw" }}>
+            {NAV.map((item) => (
               <a
-                key={item}
-                href="#"
-                className={
-                  "text-sm tracking-[0.06em] transition-opacity hover:opacity-100 " +
-                  (i === 0 ? "text-washi" : "text-washi opacity-75")
-                }
+                key={item.label}
+                href={item.href}
+                className="group relative inline-flex items-center justify-center text-washi transition-transform duration-200 ease-[var(--ease-entrance)] hover:-translate-y-[3px] active:translate-y-0"
+                style={{
+                  width: item.w,
+                  minWidth: "84px",
+                  height: "3.4896vw",
+                  minHeight: "34px",
+                }}
               >
-                {item}
+                <picture>
+                  <source srcSet="/scene/nav-pill.avif" type="image/avif" />
+                  {/* The pill is paper, so it lifts and warms on hover
+                      rather than changing colour outright — a flat tint would
+                      fight the texture. Slight scale + saturation reads as
+                      the sticker peeling up toward you. */}
+                  <img
+                    src="/scene/nav-pill.webp"
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full origin-center object-fill transition-[transform,filter] duration-200 ease-[var(--ease-entrance)] group-hover:scale-[1.06] group-hover:brightness-110 group-hover:saturate-125 group-hover:drop-shadow-[0_4px_10px_rgba(20,14,18,0.45)]"
+                  />
+                </picture>
+                <span
+                  className="relative whitespace-nowrap tracking-[0.02em] transition-[letter-spacing,text-shadow] duration-200 group-hover:tracking-[0.06em] group-hover:[text-shadow:0_1px_6px_rgba(20,14,18,0.5)]"
+                  style={{ fontSize: "max(13px, 1.7708vw)" }}
+                >
+                  {item.label}
+                </span>
               </a>
             ))}
-            <Button variant="ghost" href="#" className="h-11 px-6 text-sm">
-              Join CESA
-            </Button>
           </nav>
         </header>
 
-        {/* Takes the slack, so the copy stays optically centred and the space
-            between header and strip is never left empty. */}
-        <div className="flex min-h-0 flex-1 flex-col justify-center px-18 py-8">
-          <p className="mb-7 flex items-center gap-3.5 font-mono text-[0.6875rem] tracking-[0.34em] text-washi">
-            <span className="inline-block h-px w-9 bg-current" />
-            COMPUTER ENGINEERING STUDENTS&rsquo; ASSOCIATION
-          </p>
-
-          {/* Reggae One is very heavy and fairly wide, so this sits smaller and
-              tighter than the brush script it replaced, with leading close to 1
-              — thick strokes stack better than thin ones. */}
-          <h1 className="max-w-[60rem] font-display text-[clamp(2.25rem,6.2vw,5.5rem)] font-normal leading-[1.02] tracking-[-0.015em] text-washi">
-            <span className="block">Code.</span>
-            <span className="block pl-[6%]">Compete.</span>
-            <span className="block pl-[13%]">
-              <span className="bg-gradient-to-r from-[#ffe3ef] via-sakura to-sky-horizon bg-clip-text text-transparent">
-                Conquer.
-              </span>
-            </span>
-          </h1>
-
-          <p className="mt-8 max-w-[32rem] text-lg font-light leading-[1.75] text-washi/90">
-            The official body of the Computer Engineering Department at VIT — a place
-            to build things that work, ship them in public, and drag each other forward.
-          </p>
-
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <Button href="#events">
-              Explore Events
-              <ArrowRight />
-            </Button>
-            <Button variant="ghost" href="#team">
-              Meet the Committee
-            </Button>
-          </div>
-        </div>
-
-        {/* Sits over the empty paved courtyard — the one part of the scene with
-            room for it. */}
-        <div className="mx-18 hidden shrink-0 grid-cols-3 border-t border-washi/25 md:grid">
-          {STATS.map(({ figure, label }, i) => (
-            <div
-              key={label}
-              className={
-                "flex items-baseline gap-4 py-6 " +
-                (i > 0 ? "border-l border-washi/25 pl-10" : "")
-              }
-            >
-              <span className="font-display text-[2.25rem] leading-none text-washi">
-                {figure}
-              </span>
-              <span className="font-mono text-[0.6875rem] tracking-[0.2em] text-washi/75">
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
+        {/* Headline — Figma node 9:40, box (162, 489) 838x436 in the
+            1920x1072 frame. Positioned absolutely at those exact fractions
+            rather than flex-centred: the design sits the block at 45.6% down
+            the frame, ~9% BELOW the vertical centre, so centring it put the
+            copy noticeably higher than the design against the same painted
+            courtyard. Type is 64px -> 3.3333vw with a floor, no ceiling. */}
+        <h1
+          className="absolute font-body font-normal leading-[1.15]"
+          style={{
+            color: "#efffba",
+            left: "8.4375vw",
+            top: "45.6%",
+            width: "43.6458vw",
+            minWidth: "17rem",
+            fontSize: "max(1.25rem, 3.3333vw)",
+          }}
+        >
+          A vibrant community for Computer Engineering students to
+          innovate, learn, and grow.
+        </h1>
       </div>
     </ParallaxScene>
   );

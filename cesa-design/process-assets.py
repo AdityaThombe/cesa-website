@@ -27,7 +27,7 @@ class Layer:
     src: str
     out: str
     width: int
-    key: str = "green"          # green | magenta | none | black-glow
+    key: str = "green"          # green | magenta | glow | white | none | alpha
     crop: tuple[float, float] = (0.0, 1.0)   # keep this vertical fraction
     pad: int = 0                # transparent bleed added on every side
     trim: bool = True           # cut fully-transparent margins before padding
@@ -61,6 +61,37 @@ LAYERS: list[Layer] = [
     Layer("washi-paper.png", "washi-paper", 1024, key="none",
           note="seamless tile - never pad or crop this"),
     Layer("Plethora spotlight scene (§S6).png", "plethora", 2400, key="none"),
+    Layer("rope-hook-cutout.png", "rope-hook", 700, key="alpha",
+          note="already keyed by unscreen.py; passed through, only resized"),
+    Layer("sign-plank.png", "sign-plank", 700, key="alpha",
+          note="already a transparent cutout, pulled straight from Figma"),
+    Layer("member-card-github.png", "icon-github", 160, key="alpha",
+          note="Member Card's GitHub badge, pulled straight from Figma"),
+    Layer("cesa-lantern.png", "lantern", 700, key="green", pad=40,
+          note="team-walk corridor prop, hung from lamp posts"),
+    Layer("cesa-torii-gate.png", "torii-gate", 1400, key="green", pad=40,
+          note="team-walk corridor entrance, replaces the procedural ink-box gate"),
+    Layer("cesa-path-ground.png", "path-ground", 1600, key="none", trim=False,
+          note="team-walk ground texture — flat top-down mud/petals, no green "
+               "screen, meant to be tiled with RepeatWrapping not shown once"),
+    Layer("cesa-side-plants.png", "side-plants", 900, key="green", pad=30,
+          note="team-walk path-edge grass/flower clump, repeated along both shoulders"),
+    Layer("cesa-ground-lantern.png", "ground-lantern", 600, key="green", pad=30,
+          note="team-walk stone lantern (toro), replaces the procedural pole+bulb lamps"),
+    Layer("cesa-roped-lanterns.png", "roped-lanterns", 1600, key="green", pad=20,
+          note="team-walk overhead garland, strung across the path at each lamp stop"),
+    Layer("cesa-field-grass.png", "field-grass", 1600, key="none", trim=False,
+          note="team-walk side-field texture, flat top-down meadow, tiled with RepeatWrapping"),
+    Layer("cesa-fence.png", "fence", 900, key="green", pad=20,
+          note="team-walk low garden fence, repeated along both shoulders"),
+    Layer("cesa-tree-a.png", "tree-a", 1200, key="green", pad=40,
+          note="team-walk cherry tree variant A (leaning), alternated with tree-b"),
+    Layer("cesa-tree-b.png", "tree-b", 1200, key="green", pad=40,
+          note="team-walk cherry tree variant B (symmetric), alternated with tree-a"),
+    Layer("cesa-end-wall.png", "end-wall", 2600, key="green", pad=20,
+          note="team-walk closing backdrop, spans the full path width at the far end"),
+    Layer("cesa-mountains-temple.png", "mountains-temple", 2400, key="none",
+          note="team-walk far-horizon backdrop, no keying needed, full painted sky-to-ridge plate"),
 ]
 
 
@@ -127,6 +158,34 @@ def process(layer: Layer) -> None:
     path = SRC / layer.src
     if not path.exists():
         print(f"  MISSING  {layer.src}")
+        return
+
+    if layer.key == "alpha":
+        # Already a real transparent cutout (keyed elsewhere, or exported
+        # straight off a Figma layer with its own alpha) — pass it through
+        # untouched instead of flattening to opaque RGB.
+        out = Image.open(path).convert("RGBA")
+        if layer.trim:
+            box = out.getchannel("A").getbbox()
+            if box:
+                out = out.crop(box)
+        if layer.pad:
+            padded = Image.new("RGBA", (out.width + layer.pad * 2,
+                                        out.height + layer.pad * 2), (0, 0, 0, 0))
+            padded.paste(out, (layer.pad, layer.pad))
+            out = padded
+        target = layer.width
+        if target > out.width:
+            print(f"  NOTE     {layer.out}: source is only {out.width}px wide, "
+                  f"wanted {target}px — exporting at source size rather than "
+                  f"upscaling.")
+            target = out.width
+        if out.width != target:
+            h = round(out.height * target / out.width)
+            out = out.resize((target, h), Image.LANCZOS)
+        files = save(out, layer.out)
+        tail = f"  ({layer.note})" if layer.note else ""
+        print(f"  {layer.out:<14} {out.width}x{out.height}  " + "  ".join(files) + tail)
         return
 
     img = Image.open(path).convert("RGB")

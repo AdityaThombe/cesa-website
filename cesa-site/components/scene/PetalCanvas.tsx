@@ -25,7 +25,7 @@ type Petal = {
   alpha: number;
 };
 
-export default function PetalCanvas() {
+export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeScale?: number; count?: number }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const reduced = useReducedMotion();
 
@@ -61,7 +61,7 @@ export default function PetalCanvas() {
     };
     resize();
 
-    const count = window.innerWidth < 768 ? MOBILE_PETALS : DESKTOP_PETALS;
+    const count = countProp ?? (window.innerWidth < 768 ? MOBILE_PETALS : DESKTOP_PETALS);
 
     // Fixed pool, recycled forever — nothing is allocated per frame.
     const spawn = (petal: Petal, fromTop: boolean) => {
@@ -69,7 +69,7 @@ export default function PetalCanvas() {
       petal.y = fromTop ? -40 - Math.random() * height : Math.random() * height;
       petal.vx = -0.25 - Math.random() * 0.5;
       petal.vy = 0.5 + Math.random() * 0.9;
-      petal.size = 14 + Math.random() * 20;
+      petal.size = (14 + Math.random() * 20) * sizeScale;
       petal.rotation = Math.random() * Math.PI * 2;
       petal.spin = (Math.random() - 0.5) * 0.02;
       petal.swayPhase = Math.random() * Math.PI * 2;
@@ -171,7 +171,7 @@ export default function PetalCanvas() {
       window.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("resize", resize);
     };
-  }, [reduced]);
+  }, [reduced, sizeScale, countProp]);
 
   if (reduced) return null;
 

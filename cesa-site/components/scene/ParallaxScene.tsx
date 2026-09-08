@@ -5,8 +5,11 @@ import { useEffect, useRef } from "react";
 import { FOLLOW, MOUSE_TRAVEL, clamp, lerp, useHasPointer, useReducedMotion } from "@/lib/motion";
 import { LAYERS, STAGE } from "./sceneConfig";
 
-/** Keep this much of a layer's base below the fold even at full travel. */
-const BOTTOM_MARGIN = 24;
+/** Keep this much of a layer's base below the fold even at full travel.
+ *  Generous on purpose: the trunk's cut-off end must never come near the
+ *  bottom edge, where it would read as the tree stopping mid-air rather than
+ *  running on into the torn-paper seam. */
+const BOTTOM_MARGIN = 140;
 
 const pct = (value: number, of: number) => `${((value / of) * 100).toFixed(4)}%`;
 
@@ -69,7 +72,15 @@ export default function ParallaxScene({ children }: { children?: React.ReactNode
       if (el) {
         const rect = el.getBoundingClientRect();
         const travel = rect.height - window.innerHeight;
-        progress = travel > 0 ? clamp(-rect.top / travel, 0, 1) : 0;
+        const raw = travel > 0 ? clamp(-rect.top / travel, 0, 1) : 0;
+        // Smoothstep, not the raw ratio. Raw progress runs at constant speed
+        // right up to 1 — and 1 lands on the exact scroll position where the
+        // sticky container releases and the whole hero starts scrolling away
+        // at 1:1. Two velocity changes on the same frame is what made the
+        // trunk visibly lurch. Smoothstep's derivative is zero at both ends,
+        // so the layers have already coasted to a stop by the time the
+        // release happens and only one thing changes at a time.
+        progress = raw * raw * (3 - 2 * raw);
       }
 
       const vh = window.innerHeight / 100;
@@ -100,14 +111,32 @@ export default function ParallaxScene({ children }: { children?: React.ReactNode
           rotate = eased.x * 1.5 * lag;
         }
 
-        // Hard stop: a layer drawn with its base (the trunk and its roots)
-        // must never lift that base into frame, or the tree floats. Computed
-        // from live geometry, so it holds at any window size.
+        // A layer drawn with its base (the trunk and its roots) must never
+        // lift that base into frame, or the tree floats. Computed from live
+        // geometry, so it holds at any window size.
+        //
+        // Eased into, not clamped. `Math.max` stopped the trunk dead on a
+        // single frame partway through the scroll — the layer was travelling
+        // at full speed and then simply wasn't, which reads as the tree
+        // jerking to a halt. tanh is the identity for small travel and bends
+        // off asymptotically as it nears the limit, so the trunk decelerates
+        // into its stop and never crosses it.
         if (layer.keepBottomBelowFold && stageRect) {
+          // Derived from the stage's SIZE, never its live `top`. The stage is
+          // centred in the sticky 100vh box, so while the hero is pinned its
+          // top is exactly (innerHeight - stageHeight) / 2 — the same number
+          // the rect reports, but one that does not move.
+          //
+          // Reading `stageRect.top` instead made this limit shrink frame by
+          // frame the moment the sticky container released and began
+          // scrolling away, which walked the trunk back DOWN the screen while
+          // the page scrolled it up. The trunk visibly fought the scroll and
+          // stuttered at exactly that handoff.
+          const restingTop = (window.innerHeight - stageRect.height) / 2;
           const restingBottom =
-            stageRect.top + (layer.box.top + layer.box.height) * stageScale;
-          const allowedUp = restingBottom - window.innerHeight - BOTTOM_MARGIN;
-          y = Math.max(y, -Math.max(allowedUp, 0));
+            restingTop + (layer.box.top + layer.box.height) * stageScale;
+          const limit = Math.max(restingBottom - window.innerHeight - BOTTOM_MARGIN, 0);
+          y = limit > 0 ? -limit * Math.tanh(-y / limit) : Math.max(y, 0);
         }
 
         const scale = layer.scale ? lerp(layer.scale[0], layer.scale[1], progress) : 1;
@@ -133,7 +162,14 @@ export default function ParallaxScene({ children }: { children?: React.ReactNode
   }, [reduced, hasPointer]);
 
   return (
-    <div ref={wrapper} className="relative h-[240vh]">
+    // 112vh, down from 240vh. The painted plate only has so much art to give:
+    // at 240vh the hero held the screen for 140vh of scrolling on a still that
+    // has already finished moving, so the courtyard sat there looking spent
+    // and the torn-paper seam arrived far too late. 12vh of travel is about
+    // the floor: the parallax still reads, but the seam is barely a flick of
+    // the wheel away. Below 100vh there is no travel at all and the layers
+    // would stop moving entirely.
+    <div ref={wrapper} className="relative h-[112vh]">
       {/* The ramp behind the painted plate. It matches the art closely enough
           that a slow connection sees a dusk gradient rather than a flash of
           flat colour, and it is what renders if the image never arrives. */}

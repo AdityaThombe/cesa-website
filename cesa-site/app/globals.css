@@ -42,7 +42,7 @@
    build time. */
 @theme inline {
   --font-display: var(--font-reggae), "Arial Black", Impact, sans-serif;
-  --font-body: var(--font-zen), "Helvetica Neue", sans-serif;
+  --font-body: var(--font-inter), "Helvetica Neue", sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 }
 
@@ -150,6 +150,22 @@ a {
   mix-blend-mode: overlay;
   opacity: 0.06;
   pointer-events: none;
+}
+
+/* The hanging sign: rope and sign move as one rigid body pivoting from the
+   hook, the way an actual hung object would — never the sign alone, or the
+   rope would visibly bend at a joint that isn't there. `transform-origin`
+   sits at the hook's own position within the group, not a generic corner.
+   Global reduced-motion above already zeroes animation-duration for every
+   element, so this needs no separate media query. */
+.sign-swing {
+  transform-origin: 50% 0%;
+  animation: sign-sway 4.5s ease-in-out infinite;
+}
+
+@keyframes sign-sway {
+  0%, 100% { transform: rotate(-1.75deg); }
+  50% { transform: rotate(1.75deg); }
 }
 
 }

@@ -29,3 +29,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# --- scratch / source art, not needed to build the site ---
+# Raw plates and Figma exports the asset pipeline consumes. The processed
+# output that the site actually loads is committed under
+# cesa-site/public/scene; these are the multi-MB originals behind them.
+cutouts/
+cesa-design/__pycache__/
+cesa-design/team-bg-frames/
+cesa-design/video-preview/
+cesa-design/*-raw.png
+cesa-design/figma-*.png
+cesa-design/frame1-*.png
+cesa-design/school-new-figma.png

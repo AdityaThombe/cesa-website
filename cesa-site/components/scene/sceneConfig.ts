@@ -59,16 +59,33 @@ export type SceneLayer = {
  * it is to push the tree further down so its base can never enter frame, which
  * means re-aligning it in Figma.
  */
+/**
+ * How far the whole tree group is dropped below its Figma placement, in stage
+ * px, applied to the trunk and every canopy alike so the cluster stays welded
+ * to its own branches.
+ *
+ * Figma sits the trunk with only 203px of its base below the frame, which is
+ * tight enough that the roots can graze the fold — and the tree is meant to
+ * run off the bottom of the scene into the torn-paper seam, never to show
+ * where it ends. Dropping the group buries the base for good.
+ */
+const TREE_DROP = 90;
+
 export const LAYERS: SceneLayer[] = [
   {
-    // The baked plate, mirrored — which is what puts the school on the left
-    // and opens the right side for the tree.
+    // The baked plate, in its own orientation. It used to carry
+    // `scaleX(-1)` from an early composition that mirrored it to open the
+    // right side for the tree. Figma's "school - new" (node 9:27) is this
+    // exact file, byte for byte, placed with NO flip — so the mirror was
+    // rendering the whole courtyard backwards against the design (clock
+    // tower landing at 36% across instead of Figma's 61%). Every other box
+    // in this file is already in Figma's unmirrored coordinate space, so
+    // dropping the flip is what makes them agree.
     id: "background",
     src: "/scene/background",
     mouse: 0.22,
     scroll: 9,
-    box: { left: 0, top: -1, width: 1921, height: 1072 },
-    transform: "scaleX(-1)",
+    box: { left: -2, top: -5, width: 1921, height: 1072 },
   },
   {
     // Sits behind the tree, so the branches read against the disc.
@@ -83,19 +100,22 @@ export const LAYERS: SceneLayer[] = [
     src: "/scene/tree-trunk",
     mouse: 0.42,
     scroll: 13,
-    box: { left: 479, top: -110, width: 1933, height: 1385 },
+    box: { left: 624, top: -110 + TREE_DROP, width: 1933, height: 1385 },
     keepBottomBelowFold: true,
   },
   {
     // canopy-1, first placement: the cluster out on the left-reaching branch.
+    // `inner` is scaled to 85% of the Figma box (on top of its own crop
+    // correction) to thin the foliage out — the box itself, and therefore the
+    // cluster's anchor point on the branch, is untouched.
     id: "canopy-1a",
     src: "/scene/canopy-1",
     mouse: 0.46,
     scroll: 14,
     sway: 0,
-    box: { left: 541.63, top: 108.58, width: 367.746, height: 260.831 },
+    box: { left: 686.63, top: 108.58 + TREE_DROP, width: 367.746, height: 260.831 },
     transform: "rotate(1.09deg)",
-    inner: { width: "98.71%", height: "97.38%" },
+    inner: { width: "83.90%", height: "82.77%" },
   },
   {
     // canopy-1 again, rotated hard, as the top-right mass.
@@ -104,9 +124,9 @@ export const LAYERS: SceneLayer[] = [
     mouse: 0.55,
     scroll: 16,
     sway: 1,
-    box: { left: 1577, top: -110, width: 466.558, height: 486.761 },
+    box: { left: 1722, top: -110 + TREE_DROP, width: 466.558, height: 486.761 },
     transform: "rotate(128.15deg)",
-    inner: { width: "85.60%", height: "57.43%" },
+    inner: { width: "72.76%", height: "48.82%" },
   },
   {
     id: "canopy-2",
@@ -114,7 +134,8 @@ export const LAYERS: SceneLayer[] = [
     mouse: 0.46,
     scroll: 14,
     sway: 2,
-    box: { left: 961, top: -110, width: 396, height: 278 },
+    box: { left: 1106, top: -110 + TREE_DROP, width: 396, height: 278 },
+    inner: { width: "85%", height: "85%" },
   },
   {
     // The white-screened canopy, now usable: keyed on brightness rather than
@@ -124,6 +145,7 @@ export const LAYERS: SceneLayer[] = [
     mouse: 0.46,
     scroll: 14,
     sway: 3,
-    box: { left: 1210, top: -110, width: 580, height: 324 },
+    box: { left: 1355, top: -110 + TREE_DROP, width: 580, height: 324 },
+    inner: { width: "85%", height: "85%" },
   },
 ];
