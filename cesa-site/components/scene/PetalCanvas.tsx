@@ -75,33 +75,38 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
 
     // Fixed pool, nothing allocated per frame. Petals only fall while the
     // pointer is moving: every PX_PER_PETAL of travel shakes one sleeping
-    // petal loose from the tree's blossom, and a petal that falls off-screen
-    // goes back to sleep instead of respawning. A still cursor, a still tree.
+    // petal loose, and a petal that falls off-screen goes back to sleep
+    // instead of respawning. A still cursor, a still sky.
     //
-    // Blossom = the canopy layers' boxes from sceneConfig, mapped through the
-    // same cover-fit the stage uses (see .stage in globals.css), so petals
-    // leave from where the flowers actually are at any window size.
+    // They are released just OUTSIDE the frame — above the top edge over the
+    // tree, or past the right edge beside its canopy — so every petal drifts
+    // in from off-screen instead of materialising in the middle of the view.
+    // The tree's extent comes from the canopy layers in sceneConfig, mapped
+    // through the same cover-fit as the stage, so it holds at any window size.
     const CANOPIES = LAYERS.filter((l) => l.sway !== undefined).map((l) => l.box);
-    const blossomPoint = () => {
+    const offscreenPoint = () => {
       const stageW = Math.max(width, height * STAGE_ASPECT);
       const stageH = Math.max(height, width / STAGE_ASPECT);
       const left = (width - stageW) / 2;
       const top = (height - stageH) / 2;
-      for (let tries = 0; tries < 8; tries++) {
-        const b = CANOPIES[Math.floor(Math.random() * CANOPIES.length)];
-        // Inner part of the cluster, not its transparent margins.
-        const sx = b.left + b.width * (0.15 + Math.random() * 0.7);
-        const sy = b.top + b.height * (0.3 + Math.random() * 0.55);
-        const x = left + (sx / STAGE.width) * stageW;
-        const y = top + (sy / STAGE.height) * stageH;
-        // Some clusters sit past the frame's right edge by design.
-        if (x > 0 && x < width && y < height * 0.7) return { x, y: Math.max(y, 0) };
-      }
-      return { x: width * (0.55 + Math.random() * 0.4), y: Math.random() * height * 0.25 };
+      const treeLeft = Math.max(
+        0,
+        Math.min(...CANOPIES.map((b) => left + (b.left / STAGE.width) * stageW)),
+      );
+      const treeBottom = Math.min(
+        height * 0.6,
+        Math.max(...CANOPIES.map((b) => top + ((b.top + b.height) / STAGE.height) * stageH)),
+      );
+      const margin = 40 * sizeScale;
+      // Petals drift left as they fall, so the right edge feeds the frame
+      // as well as the top does.
+      return Math.random() < 0.6
+        ? { x: treeLeft + Math.random() * (width - treeLeft), y: -margin - Math.random() * 60 }
+        : { x: width + margin + Math.random() * 60, y: Math.random() * treeBottom };
     };
 
     const release = (petal: Petal) => {
-      const at = blossomPoint();
+      const at = offscreenPoint();
       petal.x = at.x;
       petal.y = at.y;
       petal.vx = -0.25 - Math.random() * 0.5;
