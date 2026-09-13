@@ -1,9 +1,13 @@
 /**
  * The parallax layer stack, back to front.
  *
- * Every `box` is copied from the aligned Figma frame
- * (uav64g4IwAAc8mCVMwStho, node 1:9) in STAGE pixels — the 1920x1072 frame the
- * composition was built in. ParallaxScene converts them to percentages of a
+ * Every `box` is copied from the aligned Figma frame (originally
+ * uav64g4IwAAc8mCVMwStho node 1:9, now GCeABSi7E0WdNDYKKObWS9 "CESA" node 9:26)
+ * in STAGE pixels. The later revision moved and enlarged the school plate and
+ * nudged the tree; those moves were applied as deltas onto the boxes below, so
+ * the stage offset each layer was already aligned with is preserved. STAGE is
+ * the 1920x1072 frame the composition was built in; ParallaxScene converts the
+ * boxes to percentages of a
  * stage that scales to cover the viewport, so the scene holds together at any
  * window size and the tree stays exactly where it was placed.
  *
@@ -85,7 +89,7 @@ export const LAYERS: SceneLayer[] = [
     src: "/scene/background",
     mouse: 0.22,
     scroll: 9,
-    box: { left: -2, top: -5, width: 1921, height: 1072 },
+    box: { left: -117, top: -24, width: 2147, height: 1198 },
   },
   {
     // Sits behind the tree, so the branches read against the disc.
@@ -100,7 +104,7 @@ export const LAYERS: SceneLayer[] = [
     src: "/scene/tree-trunk",
     mouse: 0.42,
     scroll: 13,
-    box: { left: 624, top: -110 + TREE_DROP, width: 1933, height: 1385 },
+    box: { left: 628, top: -100 + TREE_DROP, width: 1933, height: 1385 },
     keepBottomBelowFold: true,
   },
   {
@@ -113,7 +117,7 @@ export const LAYERS: SceneLayer[] = [
     mouse: 0.46,
     scroll: 14,
     sway: 0,
-    box: { left: 686.63, top: 108.58 + TREE_DROP, width: 367.746, height: 260.831 },
+    box: { left: 677.0, top: 84.0 + TREE_DROP, width: 367.746, height: 260.831 },
     transform: "rotate(1.09deg)",
     inner: { width: "83.90%", height: "82.77%" },
   },
@@ -124,7 +128,7 @@ export const LAYERS: SceneLayer[] = [
     mouse: 0.55,
     scroll: 16,
     sway: 1,
-    box: { left: 1722, top: -110 + TREE_DROP, width: 466.558, height: 486.761 },
+    box: { left: 1726, top: -110 + TREE_DROP, width: 466.558, height: 486.761 },
     transform: "rotate(128.15deg)",
     inner: { width: "72.76%", height: "48.82%" },
   },
@@ -134,8 +138,22 @@ export const LAYERS: SceneLayer[] = [
     mouse: 0.46,
     scroll: 14,
     sway: 2,
-    box: { left: 1106, top: -110 + TREE_DROP, width: 396, height: 278 },
+    box: { left: 1110, top: -110 + TREE_DROP, width: 396, height: 278 },
     inner: { width: "85%", height: "85%" },
+  },
+  {
+    // Figma node 31:95 — a third canopy-1 cluster, new in the latest revision,
+    // filling the upper-right between canopy-4 and the rotated top-right mass.
+    // Box is the rotated node's axis-aligned bounds from the export; `inner`
+    // follows the same (image / box) x 0.85 rule as the other rotated clusters.
+    id: "canopy-1c",
+    src: "/scene/canopy-1",
+    mouse: 0.52,
+    scroll: 15,
+    sway: 4,
+    box: { left: 1599.0, top: -200.0 + TREE_DROP, width: 399.952, height: 441.044 },
+    transform: "rotate(119.54deg)",
+    inner: { width: "77.15%", height: "48.95%" },
   },
   {
     // The white-screened canopy, now usable: keyed on brightness rather than
@@ -145,7 +163,7 @@ export const LAYERS: SceneLayer[] = [
     mouse: 0.46,
     scroll: 14,
     sway: 3,
-    box: { left: 1355, top: -110 + TREE_DROP, width: 580, height: 324 },
+    box: { left: 1359, top: -110 + TREE_DROP, width: 580, height: 324 },
     inner: { width: "85%", height: "85%" },
   },
 ];

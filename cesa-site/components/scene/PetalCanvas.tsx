@@ -11,6 +11,12 @@ const MOBILE_PETALS = 12;
 /** Cursor push: petals inside this radius drift away from the pointer. */
 const REPEL_RADIUS = 120;
 
+/** Pointer travel, in px, that shakes one petal loose. */
+const PX_PER_PETAL = 24;
+
+/** Frames a new petal takes to fade in, so it never pops into existence. */
+const FADE_IN = 18;
+
 type Petal = {
   x: number;
   y: number;
@@ -23,6 +29,8 @@ type Petal = {
   swaySpeed: number;
   sprite: number;
   alpha: number;
+  active: boolean;
+  age: number;
 };
 
 export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeScale?: number; count?: number }) {
@@ -63,10 +71,13 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
 
     const count = countProp ?? (window.innerWidth < 768 ? MOBILE_PETALS : DESKTOP_PETALS);
 
-    // Fixed pool, recycled forever — nothing is allocated per frame.
-    const spawn = (petal: Petal, fromTop: boolean) => {
-      petal.x = Math.random() * width;
-      petal.y = fromTop ? -40 - Math.random() * height : Math.random() * height;
+    // Fixed pool, nothing allocated per frame. Petals only exist while the
+    // pointer is moving: every PX_PER_PETAL of travel wakes one sleeping
+    // petal just above the cursor, and a petal that falls off-screen goes
+    // back to sleep instead of respawning. A still cursor means an empty sky.
+    const release = (petal: Petal, x: number, y: number) => {
+      petal.x = x + (Math.random() - 0.5) * 140;
+      petal.y = y - 20 - Math.random() * 140;
       petal.vx = -0.25 - Math.random() * 0.5;
       petal.vy = 0.5 + Math.random() * 0.9;
       petal.size = (14 + Math.random() * 20) * sizeScale;
@@ -76,23 +87,36 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
       petal.swaySpeed = 0.008 + Math.random() * 0.012;
       petal.sprite = Math.floor(Math.random() * SPRITE_COUNT);
       petal.alpha = 0.55 + Math.random() * 0.45;
+      petal.age = 0;
+      petal.active = true;
     };
 
-    const petals: Petal[] = Array.from({ length: count }, () => {
-      const petal = {} as Petal;
-      spawn(petal, false);
-      return petal;
-    });
+    const petals: Petal[] = Array.from({ length: count }, () => ({ active: false }) as Petal);
 
     const pointer = { x: -9999, y: -9999 };
+    let lastPointer: { x: number; y: number } | null = null;
+    let travel = 0;
     const onMove = (e: PointerEvent) => {
       const rect = el.getBoundingClientRect();
       pointer.x = e.clientX - rect.left;
       pointer.y = e.clientY - rect.top;
+      if (lastPointer) travel += Math.hypot(pointer.x - lastPointer.x, pointer.y - lastPointer.y);
+      lastPointer = { x: pointer.x, y: pointer.y };
+
+      while (travel >= PX_PER_PETAL) {
+        travel -= PX_PER_PETAL;
+        const sleeping = petals.find((p) => !p.active);
+        if (!sleeping) {
+          travel = 0; // pool is full — don't bank a burst for later
+          break;
+        }
+        release(sleeping, pointer.x, pointer.y);
+      }
     };
     const onLeave = () => {
       pointer.x = -9999;
       pointer.y = -9999;
+      lastPointer = null;
     };
 
     window.addEventListener("pointermove", onMove, { passive: true });
@@ -119,6 +143,8 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
       ctx!.clearRect(0, 0, width, height);
 
       for (const petal of petals) {
+        if (!petal.active) continue;
+        petal.age++;
         petal.swayPhase += petal.swaySpeed;
         petal.x += petal.vx + Math.sin(petal.swayPhase) * 0.6;
         petal.y += petal.vy;
@@ -136,7 +162,10 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
           petal.y += (dy / dist) * push;
         }
 
-        if (petal.y > height + 60 || petal.x < -80) spawn(petal, true);
+        if (petal.y > height + 60 || petal.x < -80) {
+          petal.active = false;
+          continue;
+        }
 
         const sprite = sprites[petal.sprite];
         if (!sprite?.complete || !sprite.naturalWidth) continue;
@@ -145,7 +174,7 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
         const h = (sprite.naturalHeight / sprite.naturalWidth) * w;
 
         ctx!.save();
-        ctx!.globalAlpha = petal.alpha;
+        ctx!.globalAlpha = petal.alpha * Math.min(1, petal.age / FADE_IN);
         ctx!.translate(petal.x, petal.y);
         ctx!.rotate(petal.rotation);
         // Flip on a slow cycle so petals tumble rather than spin flat. The

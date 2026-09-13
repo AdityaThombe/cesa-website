@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, Jaini, JetBrains_Mono, Patrick_Hand } from "next/font/google";
 
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
@@ -55,6 +55,44 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+/* The home page's own faces, as named in the Figma file (GCeABSi7E0WdNDYKKObWS9).
+ *
+ * Edo (hero headline) — Vic Fieger, 2006, freeware.
+ * ITC Machine (section headings) — ⚠ commercial: its name table reads
+ *   "Copyright 1990 Bitstream Inc. All rights reserved. Confidential." Serving
+ *   it from a public site needs a webfont license; this file was copied from
+ *   the local install the design was made with.
+ * Jaini (About copy) — Google Fonts, OFL.
+ * Patrick Hand stands in for "Figma Hand" on the card captions, which is
+ *   Figma's own in-app face and not distributable. */
+const edo = localFont({
+  src: "./fonts/Edo.ttf",
+  variable: "--face-edo",
+  display: "swap",
+  fallback: ["Impact", "sans-serif"],
+});
+
+const machine = localFont({
+  src: "./fonts/ITCMachine.otf",
+  variable: "--face-machine",
+  display: "swap",
+  fallback: ["Impact", "Arial Black", "sans-serif"],
+});
+
+const jaini = Jaini({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--face-jaini",
+  display: "swap",
+});
+
+const hand = Patrick_Hand({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--face-hand",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "CESA — Computer Engineering Students' Association",
   description:
@@ -68,7 +106,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${shuriken.variable} ${inter.variable} ${jetbrains.variable}`}
+      className={`${shuriken.variable} ${inter.variable} ${jetbrains.variable} ${edo.variable} ${machine.variable} ${jaini.variable} ${hand.variable}`}
     >
       <body>
         <SmoothScroll>{children}</SmoothScroll>

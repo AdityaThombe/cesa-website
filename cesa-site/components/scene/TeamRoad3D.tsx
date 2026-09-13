@@ -1538,7 +1538,9 @@ export default function TeamRoad3D({ members }: { members: Member[] }) {
               fades everything it's applied to, so putting it directly on
               the text element was fading the words themselves at the
               edges, not just the backdrop tint. */}
-          <div className="absolute left-[clamp(18px,3vw,40px)] top-[64px] px-3 py-2">
+          {/* Clears the site nav's CESA badge, which hangs ~150/1920 of the
+              width down over the walk's first screen on /team. */}
+          <div className="absolute left-[clamp(18px,3vw,40px)] top-[max(64px,9.4vw)] px-3 py-2">
             <div
               className="absolute inset-0 bg-ink/18 backdrop-blur-sm"
               style={{ WebkitMaskImage: "var(--chip-mask)", maskImage: "var(--chip-mask)" }}

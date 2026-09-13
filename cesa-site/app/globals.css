@@ -44,6 +44,13 @@
   --font-display: var(--font-reggae), "Arial Black", Impact, sans-serif;
   --font-body: var(--font-inter), "Helvetica Neue", sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-edo: var(--face-edo), Impact, sans-serif;
+  --font-machine: var(--face-machine), Impact, sans-serif;
+  --font-jaini: var(--face-jaini), serif;
+  --font-hand: var(--face-hand), cursive;
+  /* Segoe UI is a Windows system face, not shippable — it renders natively
+     there and falls back to Inter everywhere else. */
+  --font-segoe: "Segoe UI", var(--font-inter), sans-serif;
 }
 
 /* ============================================================
@@ -166,6 +173,65 @@ a {
 @keyframes sign-sway {
   0%, 100% { transform: rotate(-1.75deg); }
   50% { transform: rotate(1.75deg); }
+}
+
+/* Idle life for the paper-craft props. Slow, small, and each element offsets
+   its own --dur / --delay so nothing moves in step — the page should breathe,
+   not bounce. Amplitudes are in vw so they scale with the art. Reduced motion
+   is handled by the global rule at the bottom of this file. */
+.idle-float {
+  animation: idle-float var(--dur, 7s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes idle-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-0.5deg); }
+  50% { transform: translate3d(0, -0.45vw, 0) rotate(0.5deg); }
+}
+
+.idle-bob {
+  animation: idle-bob var(--dur, 5s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes idle-bob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -0.3vw, 0); }
+}
+
+/* Hung from its top, like the board. */
+.idle-swing {
+  transform-origin: 50% 0%;
+  animation: idle-swing var(--dur, 4s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes idle-swing {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+/* A lazy loop, for the paper plane. */
+.idle-drift {
+  animation: idle-drift var(--dur, 9s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes idle-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25% { transform: translate3d(0.5vw, -0.6vw, 0) rotate(3deg); }
+  50% { transform: translate3d(1vw, -0.2vw, 0) rotate(-1deg); }
+  75% { transform: translate3d(0.4vw, 0.35vw, 0) rotate(1.5deg); }
+}
+
+/* Warm light pooling and fading behind the board. Opacity only. */
+.glow-breathe {
+  animation: glow-breathe var(--dur, 5.5s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
+/* Hand-lettered notes rocking on their pin. */
+.idle-wiggle {
+  animation: idle-wiggle var(--dur, 6s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes idle-wiggle {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50% { transform: rotate(1.5deg); }
 }
 
 }

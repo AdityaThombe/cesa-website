@@ -42,3 +42,6 @@ cesa-design/*-raw.png
 cesa-design/figma-*.png
 cesa-design/frame1-*.png
 cesa-design/school-new-figma.png
+
+# raw Figma downloads for the home page; processed output is in cesa-site/public/home
+cesa-design/home-raw/
