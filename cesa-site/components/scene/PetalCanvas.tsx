@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 
 import { useReducedMotion } from "@/lib/motion";
 
+import { LAYERS, STAGE, STAGE_ASPECT } from "./sceneConfig";
+
 const SPRITE_COUNT = 8;
 const DESKTOP_PETALS = 40;
 const MOBILE_PETALS = 12;
@@ -71,13 +73,37 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
 
     const count = countProp ?? (window.innerWidth < 768 ? MOBILE_PETALS : DESKTOP_PETALS);
 
-    // Fixed pool, nothing allocated per frame. Petals only exist while the
-    // pointer is moving: every PX_PER_PETAL of travel wakes one sleeping
-    // petal just above the cursor, and a petal that falls off-screen goes
-    // back to sleep instead of respawning. A still cursor means an empty sky.
-    const release = (petal: Petal, x: number, y: number) => {
-      petal.x = x + (Math.random() - 0.5) * 140;
-      petal.y = y - 20 - Math.random() * 140;
+    // Fixed pool, nothing allocated per frame. Petals only fall while the
+    // pointer is moving: every PX_PER_PETAL of travel shakes one sleeping
+    // petal loose from the tree's blossom, and a petal that falls off-screen
+    // goes back to sleep instead of respawning. A still cursor, a still tree.
+    //
+    // Blossom = the canopy layers' boxes from sceneConfig, mapped through the
+    // same cover-fit the stage uses (see .stage in globals.css), so petals
+    // leave from where the flowers actually are at any window size.
+    const CANOPIES = LAYERS.filter((l) => l.sway !== undefined).map((l) => l.box);
+    const blossomPoint = () => {
+      const stageW = Math.max(width, height * STAGE_ASPECT);
+      const stageH = Math.max(height, width / STAGE_ASPECT);
+      const left = (width - stageW) / 2;
+      const top = (height - stageH) / 2;
+      for (let tries = 0; tries < 8; tries++) {
+        const b = CANOPIES[Math.floor(Math.random() * CANOPIES.length)];
+        // Inner part of the cluster, not its transparent margins.
+        const sx = b.left + b.width * (0.15 + Math.random() * 0.7);
+        const sy = b.top + b.height * (0.3 + Math.random() * 0.55);
+        const x = left + (sx / STAGE.width) * stageW;
+        const y = top + (sy / STAGE.height) * stageH;
+        // Some clusters sit past the frame's right edge by design.
+        if (x > 0 && x < width && y < height * 0.7) return { x, y: Math.max(y, 0) };
+      }
+      return { x: width * (0.55 + Math.random() * 0.4), y: Math.random() * height * 0.25 };
+    };
+
+    const release = (petal: Petal) => {
+      const at = blossomPoint();
+      petal.x = at.x;
+      petal.y = at.y;
       petal.vx = -0.25 - Math.random() * 0.5;
       petal.vy = 0.5 + Math.random() * 0.9;
       petal.size = (14 + Math.random() * 20) * sizeScale;
@@ -110,7 +136,7 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
           travel = 0; // pool is full — don't bank a burst for later
           break;
         }
-        release(sleeping, pointer.x, pointer.y);
+        release(sleeping);
       }
     };
     const onLeave = () => {
