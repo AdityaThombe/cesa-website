@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import MobileNav from "@/components/mobile/MobileNav";
+
 /** px in the 1920-wide Figma frame -> vw, the unit every box on the site uses. */
 const vw = (px: number) => `${(px / 19.2).toFixed(4)}vw`;
 
@@ -12,9 +14,12 @@ const vw = (px: number) => `${(px / 19.2).toFixed(4)}vw`;
  * 152x73 pill with 32px type. A shared gap and width would flatten both.
  */
 const NAV = [
-  { label: "Home", href: "/", x: 1021, y: 11, w: 135, h: 64.945, size: 34 },
-  { label: "About Us", href: "/#about", x: 1178, y: 11, w: 212, h: 67, size: 34 },
-  { label: "Events", href: "/#events", x: 1411, y: 11, w: 140, h: 67, size: 34 },
+  // Memories was added after the design: the first three pills moved 210px
+  // left to make room, keeping the design's own gaps between each of them.
+  { label: "Home", href: "/", x: 811, y: 11, w: 135, h: 64.945, size: 34 },
+  { label: "About Us", href: "/#about", x: 968, y: 11, w: 212, h: 67, size: 34 },
+  { label: "Events", href: "/#events", x: 1201, y: 11, w: 140, h: 67, size: 34 },
+  { label: "Memories", href: "/memories", x: 1351, y: 10, w: 190, h: 67, size: 34 },
   { label: "Team", href: "/team", x: 1560, y: 9, w: 140, h: 67, size: 34 },
   // No auth exists yet — this is the design's slot for it.
   { label: "LOGIN", href: "#", x: 1726, y: 6.91, w: 152, h: 73.123, size: 32 },
@@ -33,7 +38,7 @@ export default function SiteNav() {
         src="/scene/torn-edge.webp"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute left-0 top-0 z-10 w-full"
+        className="pointer-events-none absolute left-0 top-0 z-10 hidden w-full lg:block"
         style={{ height: vw(95), minHeight: "48px", transform: "scaleY(-1)" }}
       />
 
@@ -43,7 +48,7 @@ export default function SiteNav() {
       <Link
         href="/"
         aria-label="CESA home"
-        className="absolute left-0 z-20 block"
+        className="absolute left-0 z-20 hidden lg:block"
         style={{ top: vw(-39), width: vw(210), minWidth: "88px" }}
       >
         <picture>
@@ -51,6 +56,9 @@ export default function SiteNav() {
           <img src="/scene/logo-badge.webp" alt="CESA" className="w-full" />
         </picture>
       </Link>
+
+      {/* Below laptop width the bar is the phone design's, with its own menu. */}
+      <MobileNav />
 
       <nav className="absolute inset-x-0 top-0 z-20 hidden lg:block" aria-label="Primary">
         {NAV.map((item) => (
