@@ -84,13 +84,28 @@ export default function TeamBackdrop() {
 
     let width = 0;
     let height = 0;
+    /*
+     * The walk is meant to sit soft and out of focus behind the paper. That
+     * softness used to come from a CSS blur() on a full-screen, 2x-resolution
+     * canvas — which the browser has to re-filter on every frame the canvas
+     * changes, i.e. every frame of scrolling. On phones that was the lag.
+     *
+     * Now the canvas is simply drawn at half the CSS resolution and scaled up
+     * by the browser: the same softness falls out of the upscale, there is no
+     * filter to recompute, and each redraw fills a quarter of the pixels (or a
+     * sixteenth, against the old 2x buffer).
+     */
+    const RENDER_SCALE = 0.5;
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.clientWidth;
       height = canvas.clientHeight;
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = Math.max(1, Math.round(width * RENDER_SCALE));
+      canvas.height = Math.max(1, Math.round(height * RENDER_SCALE));
+      ctx.setTransform(RENDER_SCALE, 0, 0, RENDER_SCALE, 0, 0);
+      ctx.imageSmoothingQuality = "high";
+      // The old CSS saturate(0.88), applied once per draw into this small
+      // buffer instead of to the whole screen on every frame.
+      ctx.filter = "saturate(0.88)";
     };
 
     let drawn = -1;
@@ -166,13 +181,9 @@ export default function TeamBackdrop() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <canvas
-        ref={canvasRef}
-        className="h-full w-full"
-        // Pushed back behind the paper: slightly soft and a touch desaturated,
-        // so it never competes with a card for attention.
-        style={{ filter: "blur(2px) saturate(0.88)", transform: "scale(1.04)" }}
-      />
+      {/* Soft and a touch desaturated, so it never competes with a card —
+          both baked into the half-resolution drawing above, not CSS filters. */}
+      <canvas ref={canvasRef} className="h-full w-full" />
       {/* Paper veil. Opaque at both ends so the header and the page edges stay
           on washi, thinnest through the middle where the walk shows. */}
       <div
@@ -182,9 +193,12 @@ export default function TeamBackdrop() {
             "linear-gradient(to bottom, var(--color-washi) 0%, rgba(237,226,207,0.93) 12%, rgba(237,226,207,0.74) 40%, rgba(237,226,207,0.74) 62%, rgba(237,226,207,0.94) 88%, var(--color-washi) 100%)",
         }}
       />
+      {/* Paper grain. Multiplied on desktop; on phones a plain translucent
+          layer, because a full-screen blend over a canvas that redraws while
+          scrolling makes the phone re-blend the whole screen every frame. */}
       <div
-        className="absolute inset-0 opacity-50"
-        style={{ backgroundImage: "url('/scene/washi-paper.avif')", backgroundSize: "1280px auto", mixBlendMode: "multiply" }}
+        className="absolute inset-0 opacity-35 lg:opacity-50 lg:mix-blend-multiply"
+        style={{ backgroundImage: "url('/scene/washi-paper.avif')", backgroundSize: "1280px auto" }}
       />
     </div>
   );

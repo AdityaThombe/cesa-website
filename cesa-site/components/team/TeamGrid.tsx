@@ -51,35 +51,43 @@ function Cell({ entry, hidden, hasPointer }: { entry: Entry; hidden: boolean; ha
       <div data-deal>
         {/* Halo: a soft light that tracks the cursor across the whole grid and
             catches the edges of every card it passes near (--lx/--ly are set
-            by TeamGrid, in this cell's own px). */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -inset-[3px] opacity-[var(--spot,0)] transition-opacity duration-500"
-          style={{
-            borderRadius: CARD_RADIUS,
-            background:
-              "radial-gradient(260px circle at var(--lx, 50%) var(--ly, 50%), oklch(0.72 0.14 340 / 0.95), oklch(0.72 0.14 20 / 0.5) 45%, transparent 70%)",
-          }}
-        />
+            by TeamGrid, in this cell's own px). Like the glare below, it only
+            exists with a mouse: invisible on a phone anyway, the pair were
+            still thirty extra composited layers — half of them blends — riding
+            along with every scroll frame. */}
+        {hasPointer && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-[3px] opacity-[var(--spot,0)] transition-opacity duration-500"
+            style={{
+              borderRadius: CARD_RADIUS,
+              background:
+                "radial-gradient(260px circle at var(--lx, 50%) var(--ly, 50%), oklch(0.72 0.14 340 / 0.95), oklch(0.72 0.14 20 / 0.5) 45%, transparent 70%)",
+            }}
+          />
+        )}
         <div
           ref={tiltRef}
           onPointerMove={onMove}
           onPointerLeave={onLeave}
           className="relative shadow-[0_18px_40px_-22px_rgba(42,26,46,0.55)] transition-[transform,box-shadow] duration-500 ease-[var(--ease-entrance)] hover:shadow-[0_34px_60px_-24px_rgba(42,26,46,0.6)]"
-          style={{ borderRadius: CARD_RADIUS, transformStyle: "preserve-3d" }}
+          // The 3D context is for the mouse tilt; without one it only costs a layer.
+          style={{ borderRadius: CARD_RADIUS, transformStyle: hasPointer ? "preserve-3d" : undefined }}
         >
           <MemberCard member={entry} />
           {/* Glare: a highlight that slides across the card under the cursor. */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 opacity-[var(--hover,0)] mix-blend-soft-light transition-opacity duration-300"
-            style={{
-              borderRadius: CARD_RADIUS,
-              background: "radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255,255,255,0.75), transparent 55%)",
-            }}
-          />
+          {hasPointer && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-[var(--hover,0)] mix-blend-soft-light transition-opacity duration-300"
+              style={{
+                borderRadius: CARD_RADIUS,
+                background: "radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255,255,255,0.75), transparent 55%)",
+              }}
+            />
+          )}
           <span
-            className="pointer-events-none absolute left-[7.3%] top-[5%] rounded-full bg-ink/70 px-[0.7em] py-[0.25em] font-mono uppercase tracking-[0.18em] text-washi backdrop-blur-sm"
+            className="pointer-events-none absolute left-[7.3%] top-[5%] rounded-full bg-ink/75 px-[0.7em] py-[0.25em] font-mono uppercase tracking-[0.18em] text-washi lg:bg-ink/70 lg:backdrop-blur-sm"
             style={{ fontSize: "clamp(9px, 0.7vw, 11px)" }}
           >
             {entry.group}
@@ -233,12 +241,14 @@ export default function TeamGrid({ core, teams }: { core: Member[]; teams: Membe
 
       <div ref={gridRef} className="relative mx-auto mt-12 max-w-[1400px] px-6 pb-32 sm:mt-16 sm:px-10">
         {/* Ambient light following the cursor, under the cards. */}
-        <div
-          ref={glowRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 h-[520px] w-[520px] -ml-[260px] -mt-[260px] rounded-full opacity-[calc(var(--spot,0)*0.55)] blur-3xl transition-[opacity,translate] duration-700 ease-out"
-          style={{ background: "radial-gradient(circle, oklch(0.72 0.14 340 / 0.55), oklch(0.72 0.14 20 / 0.25) 50%, transparent 70%)" }}
-        />
+        {hasPointer && (
+          <div
+            ref={glowRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 h-[520px] w-[520px] -ml-[260px] -mt-[260px] rounded-full opacity-[calc(var(--spot,0)*0.55)] blur-3xl transition-[opacity,translate] duration-700 ease-out"
+            style={{ background: "radial-gradient(circle, oklch(0.72 0.14 340 / 0.55), oklch(0.72 0.14 20 / 0.25) 50%, transparent 70%)" }}
+          />
+        )}
         <div className="relative grid grid-cols-1 gap-8 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-10">
           {entries.map((entry) => (
             <Cell key={entry.name} entry={entry} hidden={filter !== "All" && entry.group !== filter} hasPointer={hasPointer} />
