@@ -38,7 +38,21 @@ export default function MemberCard({ member }: { member: Member }) {
       className="relative w-full overflow-hidden bg-washi"
       style={{ height: 0, paddingTop: "128.0803%", borderRadius: "7.16% / 5.59%", containerType: "inline-size" }}
     >
-      <div className="absolute" style={{ left: "-39.255%", top: 0, width: "184.6705%", height: "80.5369%" }}>
+      {/* --mx/--my (-1..1) and --hover come from a parent that tracks the
+          pointer (TeamGrid); unset, the scene sits still. The scene drifts
+          against the cursor and the silhouette with it, so the card reads
+          as having depth. */}
+      <div
+        className="absolute transition-transform duration-500 ease-out"
+        style={{
+          left: "-39.255%",
+          top: 0,
+          width: "184.6705%",
+          height: "80.5369%",
+          transform:
+            "translate3d(calc(var(--mx, 0) * -1.6%), calc(var(--my, 0) * -2%), 0) scale(calc(1 + var(--hover, 0) * 0.04))",
+        }}
+      >
         <picture>
           <source srcSet="/scene/plethora.avif" type="image/avif" />
           <img src="/scene/plethora.webp" alt="" aria-hidden="true" className="h-full w-full object-cover" />
@@ -53,7 +67,13 @@ export default function MemberCard({ member }: { member: Member }) {
         aria-hidden="true"
         viewBox="0 0 100 130"
         className="absolute left-1/2 -translate-x-1/2"
-        style={{ top: "32%", height: "42%", fill: "rgba(42,26,46,0.62)" }}
+        style={{
+          top: "32%",
+          height: "42%",
+          fill: "rgba(42,26,46,0.62)",
+          transform: "translate3d(calc(var(--mx, 0) * 6%), calc(var(--my, 0) * 4%), 0)",
+          transition: "transform 0.5s ease-out",
+        }}
       >
         <circle cx="50" cy="30" r="28" />
         <path d="M50 62c-30 0-46 20-46 50v18h92v-18c0-30-16-50-46-50z" />
