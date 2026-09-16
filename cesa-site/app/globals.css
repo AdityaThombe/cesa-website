@@ -48,6 +48,7 @@
   --font-machine: var(--face-machine), Impact, sans-serif;
   --font-jaini: var(--face-jaini), serif;
   --font-hand: var(--face-hand), cursive;
+  --font-itim: var(--face-itim), var(--font-inter), sans-serif;
   /* Segoe UI is a Windows system face, not shippable — it renders natively
      there and falls back to Inter everywhere else. */
   --font-segoe: "Segoe UI", var(--font-inter), sans-serif;

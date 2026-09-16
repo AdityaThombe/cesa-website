@@ -73,7 +73,7 @@ export default function SiteNav() {
               className="art-pill absolute inset-0 transition-[transform,filter] duration-200 ease-[var(--ease-entrance)] group-hover:scale-[1.06] group-hover:brightness-110 group-hover:saturate-125 group-hover:drop-shadow-[0_4px_10px_rgba(20,14,18,0.45)]"
             />
             <span
-              className="relative whitespace-nowrap tracking-[0.02em] transition-[letter-spacing,text-shadow] duration-200 group-hover:tracking-[0.06em] group-hover:[text-shadow:0_1px_6px_rgba(20,14,18,0.5)]"
+              className="relative whitespace-nowrap font-itim tracking-[0.02em] transition-[letter-spacing,text-shadow] duration-200 group-hover:tracking-[0.06em] group-hover:[text-shadow:0_1px_6px_rgba(20,14,18,0.5)]"
               style={{ fontSize: `max(12px, ${vw(item.size)})` }}
             >
               {item.label}

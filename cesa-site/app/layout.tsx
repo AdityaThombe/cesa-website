@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Inter, Jaini, JetBrains_Mono, Patrick_Hand } from "next/font/google";
+import { Inter, Itim, Jaini, JetBrains_Mono, Patrick_Hand } from "next/font/google";
 
 import MotionFX from "@/components/MotionFX";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -94,6 +94,17 @@ const jaini = Jaini({
   preload: false,
 });
 
+/**
+ * Itim — the navigation buttons' face in the Figma file (Nav-bar button, node
+ * 21:8). Google Fonts, OFL. Preloaded: the nav is on every first screen.
+ */
+const itim = Itim({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--face-itim",
+  display: "swap",
+});
+
 const hand = Patrick_Hand({
   subsets: ["latin"],
   weight: "400",
@@ -117,7 +128,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${shuriken.variable} ${inter.variable} ${jetbrains.variable} ${edo.variable} ${machine.variable} ${jaini.variable} ${hand.variable}`}
+      className={`${shuriken.variable} ${inter.variable} ${jetbrains.variable} ${edo.variable} ${machine.variable} ${jaini.variable} ${hand.variable} ${itim.variable}`}
     >
       <body>
         <SmoothScroll>{children}</SmoothScroll>

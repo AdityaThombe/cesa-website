@@ -212,7 +212,8 @@ export default function MobileNav() {
                     aria-hidden="true"
                     className={`absolute inset-0 transition-[filter] duration-200 group-active:brightness-110 ${primed ? "art-pill-wide" : "bg-torii/80 rounded-full"} ${current ? "saturate-150" : ""}`}
                   />
-                  <span className="relative font-segoe text-[1.2rem]">{link.label}</span>
+                  {/* Itim, as on the design's nav buttons; the menu reuses that pill. */}
+                  <span className="relative font-itim text-[1.3rem]">{link.label}</span>
                 </Link>
               );
             })}
