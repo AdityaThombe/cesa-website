@@ -45,3 +45,6 @@ cesa-design/school-new-figma.png
 
 # raw Figma downloads for the home page; processed output is in cesa-site/public/home
 cesa-design/home-raw/
+
+.vercel
+.env*
