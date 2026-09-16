@@ -2,7 +2,7 @@
 
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
+import type * as THREE from "three";
 
 import { clamp, lerp, useHasPointer, useReducedMotion } from "@/lib/motion";
 
@@ -61,7 +61,9 @@ const LAMP_X = 5.6;
 /** A second, sparser row further out, so depth reads between the cards. */
 const LAMP_X_FAR = 10.5;
 
-const FOG = new THREE.Color("#2a1d33");
+const FOG = "#2a1d33";
+
+type Three = typeof import("./three");
 
 /*
  * Scroll choreography, in flips of progress. Scrolling down, the cards start
@@ -198,7 +200,7 @@ function glowCanvas(stops: [number, string][], size = 128) {
 }
 
 /** A rounded rectangle centred on the origin. */
-function roundedRect(w: number, h: number, r: number) {
+function roundedRect(THREE: Three, w: number, h: number, r: number) {
   const shape = new THREE.Shape();
   const x = -w / 2;
   const y = -h / 2;
@@ -255,12 +257,36 @@ export default function MemoriesWall() {
   const reduced = useReducedMotion();
   const hasPointer = useHasPointer();
   const [deck, setDeck] = useState(0);
+  /** False until the scene has compiled and drawn once; the skeleton shows until then. */
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    const canvas = canvasRef.current;
-    if (!section || !canvas) return;
+    const sectionEl = sectionRef.current;
+    const canvasEl = canvasRef.current;
+    if (!sectionEl || !canvasEl) return;
 
+    // three.js is by far the heaviest thing on this page. Importing it here
+    // rather than at the top of the module lets the heading, the counter and
+    // the navigation hydrate without waiting for it to download and parse.
+    let stop: (() => void) | undefined;
+    let cancelled = false;
+    // Wait for the browser to be idle before even fetching it, so the page's
+    // own hydration and first paint are never queued behind a 3D renderer.
+    const start = () => {
+      import("./three").then((THREE) => {
+        if (!cancelled) stop = run(THREE, sectionEl, canvasEl);
+      });
+    };
+    const idle =
+      typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(start, { timeout: 1200 }) : window.setTimeout(start, 50);
+    return () => {
+      cancelled = true;
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+      stop?.();
+    };
+
+    function run(THREE: Three, section: HTMLElement, canvas: HTMLCanvasElement) {
     /* ---------------------------------------------------------- renderer */
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
@@ -483,8 +509,13 @@ export default function MemoriesWall() {
     });
     const fronts = canvases.map((c) => srgb(new THREE.CanvasTexture(c)));
 
-    // Fonts may land after first paint; redraw once they have.
-    document.fonts?.ready.then(() => {
+    // The canvas can't trigger a web font download the way text in the page
+    // does, and these faces aren't preloaded — ask for them outright, then
+    // redraw once they have arrived.
+    Promise.all([
+      document.fonts?.load(`400 70px ${fontFamily("--face-hand", "cursive")}`),
+      document.fonts?.load(`400 22px ${fontFamily("--font-jetbrains", "monospace")}`),
+    ]).catch(() => undefined).then(() => {
       canvases.forEach((c, i) => drawCard(c, i));
       fronts.forEach((t) => (t.needsUpdate = true));
     });
@@ -492,7 +523,7 @@ export default function MemoriesWall() {
     // A card is a rounded shape: a thin extruded rim, and a printed face laid
     // on each side just proud of it. The face UVs are remapped from shape
     // coordinates to 0..1 so the drawing fills the card.
-    const shape = roundedRect(CARD_W, CARD_H, CARD_R);
+    const shape = roundedRect(THREE, CARD_W, CARD_H, CARD_R);
     const rimGeo = track(new THREE.ExtrudeGeometry(shape, { depth: CARD_T, bevelEnabled: false, curveSegments: 10 }));
     rimGeo.translate(0, 0, -CARD_T / 2);
     const faceGeo = track(new THREE.ShapeGeometry(shape, 10));
@@ -863,9 +894,25 @@ export default function MemoriesWall() {
       renderer.render(scene, camera);
       frame = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
+
+    // Shader programs compile off the main thread where the GPU driver allows
+    // (KHR_parallel_shader_compile); compiling on the first render instead
+    // froze the page for the better part of a second on a mid-range phone.
+    // The loop starts once they are ready, and the skeleton hands over then.
+    let stopped = false;
+    renderer
+      .compileAsync(scene, camera)
+      .catch(() => undefined)
+      .then(() => {
+        if (stopped) return;
+        frame = requestAnimationFrame((now) => {
+          tick(now);
+          setReady(true);
+        });
+      });
 
     return () => {
+      stopped = true;
       cancelAnimationFrame(frame);
       ro.disconnect();
       window.removeEventListener("pointermove", onMove);
@@ -873,6 +920,7 @@ export default function MemoriesWall() {
       motion.forEach((m) => gsap.killTweensOf(m));
       disposables.forEach((d) => d.dispose());
     };
+    }
   }, [reduced, hasPointer]);
 
   return (
@@ -887,6 +935,22 @@ export default function MemoriesWall() {
     >
       <div className="sticky top-0 h-screen overflow-hidden">
         <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
+
+        {/* Loading skeleton: the wall's four cards as soft paper shapes, in
+            the same row (or 2x2 on a portrait screen) the scene will draw,
+            fading out as the first real frame lands. */}
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-[var(--ease-entrance)] ${
+            ready ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <div className="memories-skeleton">
+            {Array.from({ length: PER_DECK }, (_, i) => (
+              <span key={i} style={{ animationDelay: `${i * 120}ms` }} />
+            ))}
+          </div>
+        </div>
 
         <div className="pointer-events-none relative z-10 flex h-full flex-col items-center" style={{ paddingTop: "max(96px, 7.2vw)" }}>
           <div ref={headRef} className="flex flex-col items-center">

@@ -92,37 +92,78 @@ export default function MotionFX() {
     if (hasPointer) window.addEventListener("pointermove", onMove, { passive: true });
 
     const applied = new WeakMap<HTMLElement, { x: number; y: number }>();
+
+    // The element list only changes when nodes do, not every frame.
+    let targets: HTMLElement[] = [];
+    const collect = () => {
+      targets = Array.from(document.querySelectorAll<HTMLElement>("[data-depth]"));
+      force = true;
+    };
+    let force = true;
+    collect();
+    const mo = new MutationObserver(collect);
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    let lastScroll = NaN;
+    let lastWidth = 0;
+    let lastHeight = 0;
+    let lastDocHeight = 0;
     let frame = 0;
 
     const tick = () => {
+      frame = requestAnimationFrame(tick);
+
       pointer.x = lerp(pointer.x, pointer.tx, FOLLOW);
       pointer.y = lerp(pointer.y, pointer.ty, FOLLOW);
-      const vh = window.innerHeight;
+      const pointerMoving = Math.abs(pointer.tx - pointer.x) > 0.0005 || Math.abs(pointer.ty - pointer.y) > 0.0005;
 
-      document.querySelectorAll<HTMLElement>("[data-depth]").forEach((el) => {
+      // Nothing to do while nothing moves: no scroll, no cursor, no resize, no
+      // layout change. Most frames on a page someone is reading are this.
+      const scroll = window.scrollY;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      if (!force && !pointerMoving && scroll === lastScroll && vw === lastWidth && vh === lastHeight && docHeight === lastDocHeight) {
+        return;
+      }
+      force = false;
+      lastScroll = scroll;
+      lastWidth = vw;
+      lastHeight = vh;
+      lastDocHeight = docHeight;
+
+      // Read every position first, then write every offset. Interleaving the
+      // two made the browser recompute layout once per element, per frame.
+      const reads: { el: HTMLElement; top: number; height: number }[] = [];
+      for (const el of targets) {
+        const r = el.getBoundingClientRect();
+        // Zero-size: inside a layout hidden at this screen width.
+        if (!r.width && !r.height) continue;
+        const prev = applied.get(el);
+        // Undo our own offset so the element doesn't chase itself.
+        const top = r.top - (prev?.y ?? 0);
+        if (top > vh * 1.5 || top + r.height < -vh * 0.5) continue;
+        reads.push({ el, top, height: r.height });
+      }
+
+      for (const { el, top, height } of reads) {
         const depth = Number(el.dataset.depth) || 0;
         const prev = applied.get(el) ?? { x: 0, y: 0 };
-        const r = el.getBoundingClientRect();
-        // Undo our own offset so the element doesn't chase itself.
-        const top = r.top - prev.y;
-        if (top > vh * 1.5 || top + r.height < -vh * 0.5) return;
-
-        const fromCentre = (top + r.height / 2 - vh / 2) / vh;
+        const fromCentre = (top + height / 2 - vh / 2) / vh;
         const x = -pointer.x * POINTER_DRIFT * depth;
         const y = -fromCentre * SCROLL_DRIFT * depth - pointer.y * POINTER_DRIFT * 0.6 * depth;
-        if (Math.abs(x - prev.x) < 0.05 && Math.abs(y - prev.y) < 0.05) return;
+        if (Math.abs(x - prev.x) < 0.05 && Math.abs(y - prev.y) < 0.05) continue;
 
         applied.set(el, { x, y });
         el.style.setProperty("--px", `${x.toFixed(2)}px`);
         el.style.setProperty("--py", `${y.toFixed(2)}px`);
-      });
-
-      frame = requestAnimationFrame(tick);
+      }
     };
     frame = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(frame);
+      mo.disconnect();
       window.removeEventListener("pointermove", onMove);
     };
   }, [pathname, reduced, hasPointer]);

@@ -35,17 +35,51 @@ export default function TeamBackdrop() {
     const images: HTMLImageElement[] = [];
     let ready = 0;
 
-    // Frame 1 first, then the rest in order, so the first paint is the one
-    // the reader sees at the top of the page.
-    for (let i = 0; i < FRAMES; i++) {
+    // Frame 1 now: it is the one on screen at the top of the page. The other
+    // 29 (about 1.7MB) only matter once the reader starts to scroll, which is
+    // what moves the walk — so they wait for the first scroll, wheel, touch or
+    // key press, then come in order while the browser is idle. Someone who
+    // reads the top of the page and leaves never downloads them.
+    const loadFrame = (i: number, onDone?: () => void) => {
       const img = new Image();
       img.decoding = "async";
-      img.src = frameSrc(i);
       img.onload = () => {
-        ready++;
+        // `ready` is a count of consecutive frames from the start, so a later
+        // frame that happens to arrive early can never be scrubbed to past a
+        // gap.
+        while (ready < FRAMES && images[ready]?.complete && images[ready].naturalWidth) ready++;
         if (i === 0) draw(0);
+        onDone?.();
       };
+      img.onerror = () => onDone?.();
+      img.src = frameSrc(i);
       images[i] = img;
+    };
+
+    let cancelled = false;
+    const idle = (fn: () => void) => {
+      if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(fn, { timeout: 1500 });
+      else setTimeout(fn, 200);
+    };
+    const loadRest = (i: number) => {
+      if (cancelled || i >= FRAMES) return;
+      loadFrame(i, () => idle(() => loadRest(i + 1)));
+    };
+    const INTENT = ["scroll", "wheel", "touchstart", "keydown"] as const;
+    let started = false;
+    const startRest = () => {
+      if (started) return;
+      started = true;
+      INTENT.forEach((type) => window.removeEventListener(type, startRest));
+      idle(() => loadRest(1));
+    };
+
+    loadFrame(0);
+    // Under reduced motion the walk never moves, so only frame 1 is needed.
+    if (!reduced) {
+      INTENT.forEach((type) => window.addEventListener(type, startRest, { passive: true }));
+      // Arriving already scrolled (a reload mid-page) counts as intent too.
+      if (window.scrollY > 0) startRest();
     }
 
     let width = 0;
@@ -99,7 +133,11 @@ export default function TeamBackdrop() {
       const first = images[0];
       if (first.complete) draw(0);
       else first.addEventListener("load", () => draw(0), { once: true });
-      return () => ro.disconnect();
+      return () => {
+        cancelled = true;
+        ro.disconnect();
+        INTENT.forEach((type) => window.removeEventListener(type, startRest));
+      };
     }
 
     let eased = 0;
@@ -119,8 +157,10 @@ export default function TeamBackdrop() {
     frame = requestAnimationFrame(tick);
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(frame);
       ro.disconnect();
+      INTENT.forEach((type) => window.removeEventListener(type, startRest));
     };
   }, [reduced]);
 
@@ -144,7 +184,7 @@ export default function TeamBackdrop() {
       />
       <div
         className="absolute inset-0 opacity-50"
-        style={{ backgroundImage: "url('/scene/washi-paper.webp')", backgroundSize: "1280px auto", mixBlendMode: "multiply" }}
+        style={{ backgroundImage: "url('/scene/washi-paper.avif')", backgroundSize: "1280px auto", mixBlendMode: "multiply" }}
       />
     </div>
   );
