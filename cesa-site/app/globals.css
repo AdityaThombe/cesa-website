@@ -236,6 +236,76 @@ a {
   50% { transform: translate3d(0.4vw, -0.9vw, 0) rotate(2.5deg); }
 }
 
+/* Stretched paper art — the button pill and the torn strip — as backgrounds.
+   The design stretches both to whatever box they sit in, which is exactly
+   what `background-size: 100% 100%` does; as <img> the same stretch reads as
+   a distorted image. As backgrounds the browser also picks the pill's
+   resolution (a 480px pill covers every nav button at 1x) and nothing
+   downloads for a box that isn't rendered. AVIF is supported by every browser
+   this build targets (Chrome/Edge/Firefox 111+, Safari 16.4+). */
+/* Buttons up to 240 CSS px wide: the 480px pill is sharp at 2x. */
+.art-pill {
+  background-image: url("/scene/nav-pill-480.avif");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Wider pills (the phone menu, the desktop Explore button on very large
+   screens) need the full-size art from 2x up. */
+.art-pill-wide {
+  background-image: image-set(url("/scene/nav-pill-480.avif") 1x, url("/scene/nav-pill.avif") 2x);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.art-torn {
+  background-image: url("/scene/torn-edge.avif");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* The same tear, for strips no wider than a phone screen (1200px covers a
+   430px-wide phone at 3x). */
+.art-torn-phone {
+  background-image: url("/scene/torn-edge-1200.avif");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Memories loading skeleton: the card wall as faint paper shapes with a slow
+   sheen, laid out the way the 3D scene will lay the cards (a row, or 2x2 on a
+   portrait screen), shown only until the scene's first frame. */
+.memories-skeleton {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 2.2vw;
+  margin-top: 8vh;
+}
+.memories-skeleton span {
+  display: block;
+  height: 34vh;
+  aspect-ratio: 1 / 1.42;
+  border-radius: 1vh;
+  background: linear-gradient(110deg, rgba(237, 226, 207, 0.06) 30%, rgba(237, 226, 207, 0.15) 50%, rgba(237, 226, 207, 0.06) 70%);
+  background-size: 250% 100%;
+  box-shadow: inset 0 0 0 1px rgba(237, 226, 207, 0.1);
+  animation: skeleton-sheen 1.6s ease-in-out infinite;
+}
+@media (max-aspect-ratio: 9/10) {
+  .memories-skeleton {
+    grid-template-columns: repeat(2, auto);
+    gap: 3vw;
+  }
+  .memories-skeleton span {
+    height: auto;
+    width: 38vw;
+  }
+}
+@keyframes skeleton-sheen {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
 /* Phone hero. The sun swells very slightly; the blossom branch sways from its
    trunk, which sits off the right edge of the screen. Scale only on the sun:
    a filter on its mostly transparent layer paints the layer's whole box as a

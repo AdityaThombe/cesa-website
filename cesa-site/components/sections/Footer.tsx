@@ -1,4 +1,5 @@
 import TornStrip from "@/components/ui/TornStrip";
+import { DESKTOP, EMPTY_PIXEL } from "@/lib/art";
 
 const vw = (px: number) => `${(px / 19.2).toFixed(4)}vw`;
 
@@ -31,9 +32,10 @@ export default function Footer() {
     <footer id="contact" className="relative text-white" style={{ height: vw(735), zIndex: 3, overflowX: "clip" }}>
       <div className="absolute overflow-hidden" style={box(0, 0, 1920, 614)}>
         <picture>
-          <source srcSet="/home/footer-sky.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/home/footer-sky.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/home/footer-sky.webp" type="image/webp" />
           <img
-            src="/home/footer-sky.webp"
+            src={EMPTY_PIXEL}
             alt=""
             aria-hidden="true"
             loading="lazy"
@@ -50,8 +52,9 @@ export default function Footer() {
       ].map((s, i) => (
         <div key={i} aria-hidden="true" data-depth="0.5" className="pointer-events-none absolute overflow-hidden" style={s.at}>
           <picture>
-            <source srcSet="/home/students.avif" type="image/avif" />
-            <img src="/home/students.webp" alt="" loading="lazy" className="absolute max-w-none" style={s.crop} />
+            <source media={DESKTOP} srcSet="/home/students.avif" type="image/avif" />
+            <source media={DESKTOP} srcSet="/home/students.webp" type="image/webp" />
+            <img src={EMPTY_PIXEL} alt="" loading="lazy" className="absolute max-w-none" style={s.crop} />
           </picture>
         </div>
       ))}
@@ -63,9 +66,10 @@ export default function Footer() {
           the strip, and the logo's transparent padding, where Figma does. */}
       <div className="absolute overflow-hidden" style={box(-152, 446, 2172, 289)}>
         <picture>
-          <source srcSet="/home/footer-end.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/home/footer-end.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/home/footer-end.webp" type="image/webp" />
           <img
-            src="/home/footer-end.webp"
+            src={EMPTY_PIXEL}
             alt=""
             aria-hidden="true"
             loading="lazy"
@@ -74,8 +78,9 @@ export default function Footer() {
           />
         </picture>
         <picture>
-          <source srcSet="/home/logo-footer.avif" type="image/avif" />
-          <img src="/home/logo-footer.webp" alt="CESA" loading="lazy" className="absolute" style={box(162, 147, 210, 189)} />
+          <source media={DESKTOP} srcSet="/home/logo-footer.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/home/logo-footer.webp" type="image/webp" />
+          <img src={EMPTY_PIXEL} alt="CESA" loading="lazy" className="absolute" style={box(162, 147, 210, 189)} />
         </picture>
         <p className="absolute whitespace-nowrap font-body" style={{ left: vw(601), top: vw(204), fontSize: `max(10px, ${vw(30)})` }}>
           &copy; 2026 Computer Engineering Student Association - VIT. All rights reserved.
@@ -116,8 +121,9 @@ export default function Footer() {
             style={{ ["--dur" as string]: "3.8s", ["--delay" as string]: `${-i * 0.6}s` }}
           >
             <picture>
-              <source srcSet={`/home/${s.icon}.avif`} type="image/avif" />
-              <img src={`/home/${s.icon}.webp`} alt="" loading="lazy" className="h-full w-full object-contain" />
+              <source media={DESKTOP} srcSet={`/home/${s.icon}.avif`} type="image/avif" />
+              <source media={DESKTOP} srcSet={`/home/${s.icon}.webp`} type="image/webp" />
+              <img src={EMPTY_PIXEL} alt="" loading="lazy" className="h-full w-full object-contain" />
             </picture>
           </span>
         </a>

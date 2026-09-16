@@ -54,7 +54,7 @@ export default function TeamCard({ member }: { member: Member }) {
       onPointerLeave={onLeave}
       className="w-full max-w-[15.5rem] shrink-0 rounded-sm p-5 shadow-[0_10px_30px_-12px_rgba(42,26,46,0.35)] transition-transform duration-300 ease-out"
       style={{
-        backgroundImage: "url('/scene/washi-paper.webp')",
+        backgroundImage: "url('/scene/washi-paper.avif')",
         backgroundSize: "260px",
         backgroundColor: "var(--color-washi)",
       }}

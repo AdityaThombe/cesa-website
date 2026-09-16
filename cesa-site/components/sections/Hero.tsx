@@ -57,15 +57,10 @@ export default function Hero() {
             className="group absolute left-0 flex items-center justify-center font-segoe font-bold text-white transition-transform duration-200 ease-[var(--ease-entrance)] hover:-translate-y-[3px] active:translate-y-0"
             style={{ top: vw(393.08), width: vw(214.63), height: vw(103.25), minWidth: "108px", minHeight: "52px" }}
           >
-            <picture>
-              <source srcSet="/scene/nav-pill.avif" type="image/avif" />
-              <img
-                src="/scene/nav-pill.webp"
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 h-full w-full object-fill transition-[transform,filter] duration-200 ease-[var(--ease-entrance)] group-hover:scale-[1.05] group-hover:brightness-110 group-hover:saturate-125 group-hover:drop-shadow-[0_6px_14px_rgba(20,14,18,0.45)]"
-              />
-            </picture>
+            <span
+              aria-hidden="true"
+              className="art-pill-wide absolute inset-0 transition-[transform,filter] duration-200 ease-[var(--ease-entrance)] group-hover:scale-[1.05] group-hover:brightness-110 group-hover:saturate-125 group-hover:drop-shadow-[0_6px_14px_rgba(20,14,18,0.45)]"
+            />
             <span className="relative whitespace-nowrap" style={{ fontSize: `max(15px, ${vw(34)})` }}>
               Explore &rarr;
             </span>

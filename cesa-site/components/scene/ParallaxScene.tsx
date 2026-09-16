@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
+import { DESKTOP, EMPTY_PIXEL } from "@/lib/art";
 import { FOLLOW, MOUSE_TRAVEL, clamp, lerp, useHasPointer, useReducedMotion } from "@/lib/motion";
 import { LAYERS, STAGE } from "./sceneConfig";
 
@@ -12,6 +13,7 @@ import { LAYERS, STAGE } from "./sceneConfig";
 const BOTTOM_MARGIN = 140;
 
 const pct = (value: number, of: number) => `${((value / of) * 100).toFixed(4)}%`;
+
 
 /**
  * The hero scene.
@@ -207,9 +209,14 @@ export default function ParallaxScene({ children }: { children?: React.ReactNode
                   transform: layer.transform,
                 }}
               >
-                <source srcSet={`${layer.src}.avif`} type="image/avif" />
+                {/* Desktop only. Below laptop width this whole scene is hidden
+                    and the phone hero shows instead, but a hidden <img> still
+                    downloads — so the art only exists behind a media query, and
+                    the fallback src is an empty pixel that costs no request. */}
+                <source media={DESKTOP} srcSet={`${layer.src}.avif`} type="image/avif" />
+                <source media={DESKTOP} srcSet={`${layer.src}.webp`} type="image/webp" />
                 <img
-                  src={`${layer.src}.webp`}
+                  src={EMPTY_PIXEL}
                   alt=""
                   aria-hidden="true"
                   // Every layer is above the fold, so none may lazy-load —

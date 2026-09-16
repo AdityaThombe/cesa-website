@@ -32,6 +32,13 @@ import type { Member } from "@/lib/content";
  * making every corner render sharp despite `border-radius` being set
  * correctly the whole time.
  */
+/**
+ * Rendered width of the scene (185% of a card) in the team grid: one column
+ * under 480px, two to lg, three to xl, then four inside a 1400px container.
+ */
+const SCENE_SIZES =
+  "(min-width: 1400px) 560px, (min-width: 1280px) 46vw, (min-width: 1024px) 62vw, (min-width: 480px) 92vw, 185vw";
+
 export default function MemberCard({ member }: { member: Member }) {
   return (
     <div
@@ -53,9 +60,21 @@ export default function MemberCard({ member }: { member: Member }) {
             "translate3d(calc(var(--mx, 0) * -1.6%), calc(var(--my, 0) * -2%), 0) scale(calc(1 + var(--hover, 0) * 0.04))",
         }}
       >
+        {/* The scene is drawn at 185% of the card's width. SCENE_SIZES tracks
+            that through the team grid's columns so a phone at 1x gets the
+            800px file and anything denser still gets the full 1400. One URL is
+            shared by every card, so the high priority is one request. */}
         <picture>
-          <source srcSet="/scene/plethora.avif" type="image/avif" />
-          <img src="/scene/plethora.webp" alt="" aria-hidden="true" className="h-full w-full object-cover" />
+          <source srcSet="/scene/plethora-800.avif 800w, /scene/plethora.avif 1400w" sizes={SCENE_SIZES} type="image/avif" />
+          <img
+            src="/scene/plethora.webp"
+            srcSet="/scene/plethora-800.webp 800w, /scene/plethora.webp 1400w"
+            sizes={SCENE_SIZES}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            className="h-full w-full object-cover"
+          />
         </picture>
       </div>
 
@@ -85,7 +104,10 @@ export default function MemberCard({ member }: { member: Member }) {
         className="absolute overflow-hidden"
         style={{ left: 0, top: "-7.2707%", width: "100%", height: "18.5682%", transform: "rotate(180deg)" }}
       >
-        <img src="/scene/torn-edge.webp" alt="" className="h-full w-full object-cover" />
+        <picture>
+          <source srcSet="/scene/torn-edge.avif" type="image/avif" />
+          <img src="/scene/torn-edge.webp" alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+        </picture>
       </div>
 
       {/* bottom seam — ragged edge pointing up, the handoff into paper */}
@@ -94,7 +116,10 @@ export default function MemberCard({ member }: { member: Member }) {
         className="absolute overflow-hidden"
         style={{ left: "-37.9656%", top: "71.4765%", width: "171.0602%", height: "31.3199%" }}
       >
-        <img src="/scene/torn-edge.webp" alt="" className="h-full w-full object-cover" />
+        <picture>
+          <source srcSet="/scene/torn-edge.avif" type="image/avif" />
+          <img src="/scene/torn-edge.webp" alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+        </picture>
       </div>
 
       {/* Figma pinned Name and Position at independent fixed offsets, sized

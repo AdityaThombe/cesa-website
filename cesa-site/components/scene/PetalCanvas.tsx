@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { useReducedMotion } from "@/lib/motion";
+import { useHasPointer, useReducedMotion } from "@/lib/motion";
 
 import { LAYERS, STAGE, STAGE_ASPECT } from "./sceneConfig";
 
@@ -38,9 +38,13 @@ type Petal = {
 export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeScale?: number; count?: number }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const reduced = useReducedMotion();
+  // Petals are shaken loose by pointer travel and nothing else, so without a
+  // mouse (phones, tablets, and the hidden desktop hero on small screens)
+  // there is nothing to animate: skip the sprite downloads and the loop.
+  const hasPointer = useHasPointer();
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !hasPointer) return;
 
     const el = canvas.current;
     const ctx = el?.getContext("2d");
@@ -231,7 +235,7 @@ export default function PetalCanvas({ sizeScale = 1, count: countProp }: { sizeS
       window.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("resize", resize);
     };
-  }, [reduced, sizeScale, countProp]);
+  }, [reduced, hasPointer, sizeScale, countProp]);
 
   if (reduced) return null;
 

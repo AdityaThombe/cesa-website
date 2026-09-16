@@ -1,4 +1,5 @@
 import TornStrip from "@/components/ui/TornStrip";
+import { DESKTOP, EMPTY_PIXEL } from "@/lib/art";
 
 const vw = (px: number) => `${(px / 19.2).toFixed(4)}vw`;
 
@@ -27,7 +28,7 @@ export default function About() {
         // sit over its neighbours; this keeps both above the sticky hero.
         zIndex: 1,
         backgroundColor: "var(--color-washi)",
-        backgroundImage: "url('/scene/washi-paper.webp')",
+        backgroundImage: "url('/scene/washi-paper.avif')",
         backgroundSize: "100% 100%",
         // Doodles run off both edges by design (the laptop sits at x -58).
         overflowX: "clip",
@@ -58,9 +59,12 @@ export default function About() {
       ))}
 
       <picture>
-        <source srcSet="/home/doodle-computer.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-computer.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-computer.webp" type="image/webp" />
         <img
-          src="/home/doodle-computer.webp"
+          loading="lazy"
+          decoding="async"
+          src={EMPTY_PIXEL}
           alt=""
           aria-hidden="true"
           data-depth="1.4"
@@ -74,22 +78,38 @@ export default function About() {
       <div className="sign-swing absolute z-10" style={box(255, 183, 1360, 895)}>
         {/* Hook top at the midpoint of the whole Transition-1 group (y1150),
             so the rope emerges out of the middle of the tear. */}
-        <img
-          src="/scene/rope-hook.webp"
-          alt=""
-          aria-hidden="true"
-          className="absolute"
-          style={{
-            ...box(519, -199, 322, 328),
-            filter: "drop-shadow(0.15vw 0.35vw 0.3vw rgba(20,14,18,0.5))",
-          }}
-        />
-        <img src="/scene/about-frame.webp" alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+        <picture>
+          <source media={DESKTOP} srcSet="/scene/rope-hook.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/scene/rope-hook.webp" type="image/webp" />
+          <img
+          loading="lazy"
+          decoding="async"
+            src={EMPTY_PIXEL}
+            alt=""
+            aria-hidden="true"
+            className="absolute"
+            style={{
+              ...box(519, -199, 322, 328),
+              filter: "drop-shadow(0.15vw 0.35vw 0.3vw rgba(20,14,18,0.5))",
+            }}
+          />
+        </picture>
+        {/* AVIF first: the board is the heaviest image below the hero, and the
+            WebP alone is twice the size. */}
+        <picture>
+          <source media={DESKTOP} srcSet="/scene/about-frame.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/scene/about-frame.webp" type="image/webp" />
+          <img
+          loading="lazy"
+          decoding="async" src={EMPTY_PIXEL} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+        </picture>
 
         {/* Board blur (46:45): a warm, heavily blurred ellipse over the grain
             that lifts the centre of the board behind the copy. */}
         <div aria-hidden="true" className="pointer-events-none absolute" style={box(29, 23, 1314, 852)}>
           <img
+          loading="lazy"
+          decoding="async"
             src="/home/board-blur.svg"
             alt=""
             className="absolute max-w-none"
@@ -119,9 +139,12 @@ export default function About() {
       </div>
 
       <picture>
-        <source srcSet="/home/doodle-plane.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-plane.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-plane.webp" type="image/webp" />
         <img
-          src="/home/doodle-plane.webp"
+          loading="lazy"
+          decoding="async"
+          src={EMPTY_PIXEL}
           alt=""
           aria-hidden="true"
           data-depth="1.8"
@@ -134,9 +157,12 @@ export default function About() {
           its own 230.9x247.1 turned 13.27deg inside it. */}
       <div aria-hidden="true" data-depth="1.1" className="idle-swing pointer-events-none absolute z-10 flex items-center justify-center" style={{ ...box(1639, 105, 281.456, 293.5), ["--dur" as string]: "4.6s" }}>
         <picture>
-          <source srcSet="/home/doodle-bulb.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/home/doodle-bulb.avif" type="image/avif" />
+          <source media={DESKTOP} srcSet="/home/doodle-bulb.webp" type="image/webp" />
           <img
-            src="/home/doodle-bulb.webp"
+          loading="lazy"
+          decoding="async"
+            src={EMPTY_PIXEL}
             alt=""
             className="max-w-none object-contain"
             style={{ width: vw(230.902), height: vw(247.096), transform: "rotate(13.27deg)" }}

@@ -24,9 +24,11 @@ import "./globals.css";
  * much bigger visual jump than degrading to a face in the same brush family.
  */
 const shuriken = localFont({
-  src: "./fonts/TheLastShuriken.ttf",
+  src: "./fonts/TheLastShuriken.woff2",
   variable: "--font-reggae",
   display: "swap",
+  // Member names only; nothing on a first screen waits for it.
+  preload: false,
   fallback: ["Impact", "Arial Black", "sans-serif"],
 });
 
@@ -40,7 +42,8 @@ const shuriken = localFont({
  */
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  // Only regular and bold are used anywhere; 300 and 500 were dead weight.
+  weight: ["400", "700"],
   variable: "--font-inter",
   display: "swap",
 });
@@ -51,9 +54,11 @@ const inter = Inter({
  */
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: "400",
   variable: "--font-jetbrains",
   display: "swap",
+  // Small labels below the fold; loads when first used.
+  preload: false,
 });
 
 /* The home page's own faces, as named in the Figma file (GCeABSi7E0WdNDYKKObWS9).
@@ -67,14 +72,14 @@ const jetbrains = JetBrains_Mono({
  * Patrick Hand stands in for "Figma Hand" on the card captions, which is
  *   Figma's own in-app face and not distributable. */
 const edo = localFont({
-  src: "./fonts/Edo.ttf",
+  src: "./fonts/Edo.woff2",
   variable: "--face-edo",
   display: "swap",
   fallback: ["Impact", "sans-serif"],
 });
 
 const machine = localFont({
-  src: "./fonts/ITCMachine.otf",
+  src: "./fonts/ITCMachine.woff2",
   variable: "--face-machine",
   display: "swap",
   fallback: ["Impact", "Arial Black", "sans-serif"],
@@ -85,6 +90,8 @@ const jaini = Jaini({
   weight: "400",
   variable: "--face-jaini",
   display: "swap",
+  // The About copy, below the hero.
+  preload: false,
 });
 
 const hand = Patrick_Hand({
@@ -92,6 +99,9 @@ const hand = Patrick_Hand({
   weight: "400",
   variable: "--face-hand",
   display: "swap",
+  // Card captions, below the fold. Memories draws it into a canvas and loads
+  // it explicitly before doing so.
+  preload: false,
 });
 
 export const metadata: Metadata = {

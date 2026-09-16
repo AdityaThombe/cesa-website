@@ -1,4 +1,5 @@
 import TornStrip from "@/components/ui/TornStrip";
+import { DESKTOP, EMPTY_PIXEL } from "@/lib/art";
 
 const vw = (px: number) => `${(px / 19.2).toFixed(4)}vw`;
 
@@ -61,9 +62,12 @@ export default function Events() {
       style={{ height: vw(837), zIndex: 2, backgroundColor: "#eee3cf", overflowX: "clip" }}
     >
       <picture>
-        <source srcSet="/home/events-bg.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/events-bg.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/events-bg.webp" type="image/webp" />
         <img
-          src="/home/events-bg.webp"
+          loading="lazy"
+          decoding="async"
+          src={EMPTY_PIXEL}
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute object-cover"
@@ -75,9 +79,12 @@ export default function Events() {
       <TornStrip y={-95} h={95} />
 
       <picture>
-        <source srcSet="/home/doodle-memories.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-memories.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-memories.webp" type="image/webp" />
         <img
-          src="/home/doodle-memories.webp"
+          loading="lazy"
+          decoding="async"
+          src={EMPTY_PIXEL}
           alt="Collecting memories, not just certificates"
           data-depth="1.2"
           className="idle-wiggle absolute origin-top object-contain"
@@ -85,9 +92,12 @@ export default function Events() {
         />
       </picture>
       <picture>
-        <source srcSet="/home/doodle-build.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-build.avif" type="image/avif" />
+        <source media={DESKTOP} srcSet="/home/doodle-build.webp" type="image/webp" />
         <img
-          src="/home/doodle-build.webp"
+          loading="lazy"
+          decoding="async"
+          src={EMPTY_PIXEL}
           alt="Build, learn, share, repeat"
           data-depth="0.9"
           className="idle-wiggle absolute origin-top object-contain"
@@ -137,9 +147,23 @@ export default function Events() {
                 style={{ ...box(wx - fx, wy - fy, ww, wh), borderRadius: vw(card.radius) }}
               >
                 <picture>
-                  <source srcSet={`/home/${card.photo}.avif`} type="image/avif" />
+                  {/* The photo window is 495 of 1920 frame px, about 26vw: the
+                      800px file covers it up to a 3000px-wide 1x screen, and
+                      2x screens still get the full 1100. */}
+                  <source
+                    media={DESKTOP}
+                    srcSet={`/home/${card.photo}-800.avif 800w, /home/${card.photo}.avif 1100w`}
+                    sizes="26vw"
+                    type="image/avif"
+                  />
+                  <source
+                    media={DESKTOP}
+                    srcSet={`/home/${card.photo}-800.webp 800w, /home/${card.photo}.webp 1100w`}
+                    sizes="26vw"
+                    type="image/webp"
+                  />
                   <img
-                    src={`/home/${card.photo}.webp`}
+                    src={EMPTY_PIXEL}
                     alt={card.alt}
                     loading="lazy"
                     className="absolute max-w-none object-cover transition-transform duration-500 ease-[var(--ease-entrance)] group-hover:scale-[1.06]"
@@ -148,9 +172,10 @@ export default function Events() {
                 </picture>
               </div>
               <picture>
-                <source srcSet="/home/card-frame.avif" type="image/avif" />
+                <source media={DESKTOP} srcSet="/home/card-frame-640.avif 640w, /home/card-frame.avif 1060w" sizes="28vw" type="image/avif" />
+                <source media={DESKTOP} srcSet="/home/card-frame-640.webp 640w, /home/card-frame.webp 1060w" sizes="28vw" type="image/webp" />
                 <img
-                  src="/home/card-frame.webp"
+                  src={EMPTY_PIXEL}
                   alt=""
                   aria-hidden="true"
                   loading="lazy"

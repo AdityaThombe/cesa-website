@@ -42,12 +42,7 @@ export default function TornStrip({
         transform: flip ? "scaleY(-1)" : undefined,
       }}
     >
-      <img
-        src="/scene/torn-edge.webp"
-        alt=""
-        className="absolute max-w-none"
-        style={{ left: "1.92%", top: vw(artTop), width: "100%", height: vw(artH) }}
-      />
+      <div className="art-torn absolute" style={{ left: "1.92%", top: vw(artTop), width: "100%", height: vw(artH) }} />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { scrollToAnchor } from "@/components/mobile/HashScroll";
+import { PHONE } from "@/lib/art";
 
 /** The phone frame is 390px wide; everything here scales off it. */
 const m = (px: number) => `${(px / 3.9).toFixed(4)}vw`;
@@ -35,6 +36,28 @@ export default function MobileNav() {
   const panelRef = useRef<HTMLDivElement>(null);
   /** A section to scroll to once the menu has closed and the page is free to move. */
   const pendingAnchor = useRef<string | null>(null);
+  /**
+   * The closed menu is off-screen but still rendered, so its paper texture and
+   * six pills (about 200KB) would download with the page. They are attached
+   * once the page has loaded and gone idle — or the moment the menu opens,
+   * whichever is first — so they never compete with the first paint.
+   */
+  const [primed, setPrimed] = useState(false);
+  useEffect(() => {
+    if (primed) return;
+    const prime = () => setPrimed(true);
+    let idle = 0;
+    const whenIdle = () => {
+      idle = typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(prime, { timeout: 4000 }) : window.setTimeout(prime, 1500);
+    };
+    if (document.readyState === "complete") whenIdle();
+    else window.addEventListener("load", whenIdle, { once: true });
+    return () => {
+      window.removeEventListener("load", whenIdle);
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, [primed]);
 
   // Close on navigation.
   useEffect(() => setOpen(false), [pathname]);
@@ -92,13 +115,11 @@ export default function MobileNav() {
   return (
     <div className="lg:hidden">
       {/* Torn strip (79:3), flipped so the tear hangs down. */}
+      {/* It is the largest thing on a phone's first screen on Team and
+          Memories, so it is preloaded at high priority — phone widths only. */}
+      <link rel="preload" as="image" href="/scene/torn-edge-1200.avif" type="image/avif" media={PHONE} fetchPriority="high" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-10 overflow-hidden" style={{ height: m(57) }}>
-        <img
-          src="/scene/torn-edge.webp"
-          alt=""
-          className="absolute left-0 w-full max-w-none"
-          style={{ top: "-3.47%", height: "106.94%", transform: "scaleY(-1)" }}
-        />
+        <div className="art-torn-phone absolute left-0 w-full" style={{ top: "-3.47%", height: "106.94%", transform: "scaleY(-1)" }} />
       </div>
 
       {/* Badge (79:5). */}
@@ -116,7 +137,10 @@ export default function MobileNav() {
         aria-label="Open menu"
         aria-expanded={open}
         aria-controls={menuId}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setPrimed(true);
+          setOpen(true);
+        }}
         className="absolute z-20 flex items-center justify-center rounded-full transition-transform duration-200 active:scale-90"
         style={{ right: `calc(${m(17)} - 10px)`, top: `calc(${m(10)} - 10px)`, width: `calc(${m(24)} + 20px)`, height: `calc(${m(24)} + 20px)` }}
       >
@@ -149,7 +173,7 @@ export default function MobileNav() {
           }`}
           style={{
             backgroundColor: "var(--color-washi)",
-            backgroundImage: "url('/scene/washi-paper.webp')",
+            backgroundImage: primed ? "url('/scene/washi-paper.avif')" : undefined,
             backgroundSize: "cover",
             boxShadow: "-12px 0 40px -10px rgba(20,12,24,0.5)",
           }}
@@ -184,15 +208,10 @@ export default function MobileNav() {
                     transitionDelay: open ? `${120 + i * 55}ms` : "0ms",
                   }}
                 >
-                  <picture>
-                    <source srcSet="/scene/nav-pill.avif" type="image/avif" />
-                    <img
-                      src="/scene/nav-pill.webp"
-                      alt=""
-                      aria-hidden="true"
-                      className={`absolute inset-0 h-full w-full object-fill transition-[filter] duration-200 group-active:brightness-110 ${current ? "saturate-150" : ""}`}
-                    />
-                  </picture>
+                  <span
+                    aria-hidden="true"
+                    className={`absolute inset-0 transition-[filter] duration-200 group-active:brightness-110 ${primed ? "art-pill-wide" : "bg-torii/80 rounded-full"} ${current ? "saturate-150" : ""}`}
+                  />
                   <span className="relative font-segoe text-[1.2rem]">{link.label}</span>
                 </Link>
               );

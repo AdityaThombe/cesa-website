@@ -1,4 +1,5 @@
 import HashScroll from "@/components/mobile/HashScroll";
+import { EMPTY_PIXEL, PHONE } from "@/lib/art";
 
 /**
  * The phone home page — Figma "CESA", frame "iPhone 13 & 14 - 1" (node 79:2),
@@ -29,6 +30,10 @@ function Pic({
   className = "",
   style,
   eager = false,
+  priority = false,
+  lowPriority = false,
+  widths,
+  sizes,
 }: {
   src: string;
   alt?: string;
@@ -36,15 +41,35 @@ function Pic({
   style?: React.CSSProperties;
   /** First-screen art loads immediately; everything below the fold waits. */
   eager?: boolean;
+  /** The first screen's largest image: fetch it ahead of everything else. */
+  priority?: boolean;
+  /** Visible on the first screen but secondary: let the priority images go first. */
+  lowPriority?: boolean;
+  /**
+   * [smaller variant, full size] in px, when a `<src>-<smaller>` file exists.
+   * With `sizes`, the browser picks the smallest file that is still sharp at
+   * the screen's pixel density — a 3x phone still gets the full-size file.
+   */
+  widths?: [number, number];
+  sizes?: string;
 }) {
+  const set = (ext: string) => (widths ? `${src}-${widths[0]}.${ext} ${widths[0]}w, ${src}.${ext} ${widths[1]}w` : `${src}.${ext}`);
+  const sizesAttr = widths ? sizes : undefined;
+
+  // This layout is display:none on desktop. Chrome still fetches images inside
+  // a hidden tree, so every image here is only offered to phone-sized screens,
+  // with an empty pixel as the fallback everywhere else.
   return (
     <picture>
-      <source srcSet={`${src}.avif`} type="image/avif" />
+      <source media={PHONE} srcSet={set("avif")} sizes={sizesAttr} type="image/avif" />
+      <source media={PHONE} srcSet={set("webp")} sizes={sizesAttr} type="image/webp" />
       <img
-        src={`${src}.webp`}
+        src={EMPTY_PIXEL}
         alt={alt}
         aria-hidden={alt ? undefined : true}
         loading={eager ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : lowPriority ? "low" : undefined}
+        decoding={eager ? undefined : "async"}
         draggable={false}
         className={className}
         style={style}
@@ -61,7 +86,7 @@ function Torn({ x, y, w, h, crop, flip = false }: { x: number; y: number; w: num
       className="pointer-events-none absolute z-20 overflow-hidden"
       style={{ ...box(x, y, w, h), transform: flip ? "scaleY(-1)" : undefined }}
     >
-      <img src="/scene/torn-edge.webp" alt="" className="absolute max-w-none" style={{ left: "1.92%", top: crop.top, width: "100%", height: crop.h }} />
+      <div className="art-torn absolute" style={{ left: "1.92%", top: crop.top, width: "100%", height: crop.h }} />
     </div>
   );
 }
@@ -115,13 +140,20 @@ export default function MobileHome() {
 
       {/* ------------------------------------------------------------ Hero */}
       <div data-anchor="home" className="absolute left-0 top-0" />
-      <Pic src="/mobile/hero-bg" eager className="absolute max-w-none object-cover" style={box(-79, -186, 508, 1098)} />
+      <Pic src="/mobile/hero-bg" eager priority className="absolute max-w-none object-cover" style={box(-79, -186, 508, 1098)} />
       <div data-depth="-0.6" className="sun-pulse pointer-events-none absolute" style={box(88, 129, 326, 178)}>
-        <Pic src="/mobile/hero-sun" eager className="h-full w-full max-w-none object-cover" />
+        <Pic src="/mobile/hero-sun" eager lowPriority widths={[600, 980]} sizes="84vw" className="h-full w-full max-w-none object-cover" />
       </div>
-      {/* The blossom branch hangs in from the right; it sways from the trunk. */}
-      <div data-depth="0.8" className="branch-sway pointer-events-none absolute" style={box(208, -122, 1306, 1205)}>
-        <Pic src="/mobile/hero-tree" eager className="h-full w-full max-w-none object-cover" />
+      {/* The blossom branch hangs in from the right; it sways from the trunk.
+          The art is cropped to the 460 design px that can ever be on screen
+          (the node is 1306 wide and runs far off the right edge); the pivot
+          is moved to match, so the sway is the same as the full-size node's. */}
+      <div
+        data-depth="0.8"
+        className="branch-sway pointer-events-none absolute"
+        style={{ ...box(208, -122, 460, 1205), transformOrigin: "85.2% 55%" }}
+      >
+        <Pic src="/mobile/hero-tree" eager priority className="h-full w-full max-w-none object-cover" />
       </div>
 
       <div data-reveal className="absolute" style={box(37, 209, 190, 28)}>
@@ -156,11 +188,7 @@ export default function MobileHome() {
         className="group absolute flex items-center justify-center font-segoe font-bold text-white transition-transform duration-200 ease-[var(--ease-entrance)] active:scale-95"
         style={{ ...box(38.97, 422, 126.35, 60.78), ["--reveal-delay" as string]: "260ms" }}
       >
-        <Pic
-          src="/scene/nav-pill"
-          eager
-          className="absolute inset-0 h-full w-full object-fill transition-[filter] duration-200 group-active:brightness-110"
-        />
+        <span aria-hidden="true" className="art-pill absolute inset-0 transition-[filter] duration-200 group-active:brightness-110" />
         <span className="relative whitespace-nowrap" style={{ fontSize: m(19), paddingLeft: m(8) }}>
           Explore &rarr;
         </span>
@@ -173,7 +201,7 @@ export default function MobileHome() {
         className="absolute"
         style={{
           ...box(-465, 900, 1328, 886),
-          backgroundImage: "url('/scene/washi-paper.webp')",
+          backgroundImage: "url('/scene/washi-paper.avif')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -207,7 +235,7 @@ export default function MobileHome() {
         &ldquo;Code. Compete. Conquer.&rdquo;, we shape the next generation of tech leaders.
       </p>
       <div aria-hidden="true" data-depth="1.4" className="idle-drift pointer-events-none absolute z-10" style={box(-28, 1589, 168, 112)}>
-        <Pic src="/home/doodle-plane" className="h-full w-full max-w-none object-cover" />
+        <Pic src="/home/doodle-plane" widths={[480, 820]} sizes="44vw" className="h-full w-full max-w-none object-cover" />
       </div>
 
       {/* Footer sky (82:127). Figma layers it beneath Events & Projects, whose
@@ -254,9 +282,9 @@ export default function MobileHome() {
               style={{ ["--dur" as string]: `${6.5 + i * 0.9}s`, ["--delay" as string]: `${-i * 1.7}s` }}
             >
               <div className="absolute overflow-hidden" style={{ ...box(wx - fx, wy - fy, ww, wh), borderRadius: m(card.radius) }}>
-                <Pic src={`/home/${card.photo}`} alt={card.alt} className="absolute max-w-none object-cover" style={card.crop} />
+                <Pic src={`/home/${card.photo}`} alt={card.alt} widths={[800, 1100]} sizes="79vw" className="absolute max-w-none object-cover" style={card.crop} />
               </div>
-              <Pic src="/home/card-frame" className="pointer-events-none absolute inset-0 h-full w-full" />
+              <Pic src="/home/card-frame" widths={[640, 1060]} sizes="85vw" className="pointer-events-none absolute inset-0 h-full w-full" />
               <figcaption
                 className="absolute whitespace-nowrap font-hand text-black"
                 style={{ left: m(card.captionAt[0] - fx), top: m(card.captionAt[1] - fy), fontSize: m(30), lineHeight: "normal", letterSpacing: m(2) }}
