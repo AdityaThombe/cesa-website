@@ -28,7 +28,7 @@ const SOCIALS = [
  */
 export default function Footer() {
   return (
-    <footer className="relative text-white" style={{ height: vw(735), zIndex: 3, overflowX: "clip" }}>
+    <footer id="contact" className="relative text-white" style={{ height: vw(735), zIndex: 3, overflowX: "clip" }}>
       <div className="absolute overflow-hidden" style={box(0, 0, 1920, 614)}>
         <picture>
           <source srcSet="/home/footer-sky.avif" type="image/avif" />
@@ -48,7 +48,7 @@ export default function Footer() {
         { at: box(59, 238, 533, 376), crop: { left: "8.5%", top: "0.1%", width: "211.92%", height: "100%" } },
         { at: box(1268, 230, 578, 384), crop: { left: "-81.36%", top: "3.24%", width: "186.52%", height: "93.52%" } },
       ].map((s, i) => (
-        <div key={i} aria-hidden="true" className="pointer-events-none absolute overflow-hidden" style={s.at}>
+        <div key={i} aria-hidden="true" data-depth="0.5" className="pointer-events-none absolute overflow-hidden" style={s.at}>
           <picture>
             <source srcSet="/home/students.avif" type="image/avif" />
             <img src="/home/students.webp" alt="" loading="lazy" className="absolute max-w-none" style={s.crop} />
@@ -82,16 +82,16 @@ export default function Footer() {
         </p>
       </div>
 
-      <h2 className="absolute inset-x-0 text-center font-machine font-normal leading-none" style={{ top: vw(70), fontSize: vw(96) }}>
+      <h2 data-reveal className="absolute inset-x-0 text-center font-machine font-normal leading-none" style={{ top: vw(70), fontSize: vw(96) }}>
         Contact
       </h2>
-      <p className="absolute inset-x-0 text-center font-segoe" style={{ top: vw(190), fontSize: `max(12px, ${vw(40)})` }}>
+      <p data-reveal className="absolute inset-x-0 text-center font-segoe" style={{ ["--reveal-delay" as string]: "150ms", top: vw(190), fontSize: `max(12px, ${vw(40)})` }}>
         Email:{" "}
         <a href="mailto:cesa.vidyalankar@gmail.com" className="underline-offset-4 hover:underline">
           cesa.vidyalankar@gmail.com
         </a>
       </p>
-      <p className="absolute inset-x-0 text-center font-body" style={{ top: vw(264), fontSize: `max(10px, ${vw(29)})` }}>
+      <p data-reveal className="absolute inset-x-0 text-center font-body" style={{ ["--reveal-delay" as string]: "260ms", top: vw(264), fontSize: `max(10px, ${vw(29)})` }}>
         Location: Vidyalankar Institute of Technology, Wadala, Mumbai
       </p>
 

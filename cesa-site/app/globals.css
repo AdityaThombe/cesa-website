@@ -225,6 +225,38 @@ a {
   50% { opacity: 1; }
 }
 
+/* The ink drawings behind the board: a slow rock around their base plus a
+   small lift, so they read as moving from across the room, not just breathing. */
+.idle-rock {
+  transform-origin: 50% 90%;
+  animation: idle-rock var(--dur, 6s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes idle-rock {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-2.5deg); }
+  50% { transform: translate3d(0.4vw, -0.9vw, 0) rotate(2.5deg); }
+}
+
+/* Phone hero. The sun swells very slightly; the blossom branch sways from its
+   trunk, which sits off the right edge of the screen. Scale only on the sun:
+   a filter on its mostly transparent layer paints the layer's whole box as a
+   visible rectangle over the sky. */
+.sun-pulse {
+  animation: sun-pulse var(--dur, 7s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes sun-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+.branch-sway {
+  transform-origin: 30% 55%;
+  animation: branch-sway var(--dur, 8s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes branch-sway {
+  0%, 100% { transform: rotate(-0.8deg); }
+  50% { transform: rotate(0.8deg); }
+}
+
 /* Hand-lettered notes rocking on their pin. */
 .idle-wiggle {
   animation: idle-wiggle var(--dur, 6s) ease-in-out var(--delay, 0s) infinite;
@@ -234,6 +266,39 @@ a {
   50% { transform: rotate(1.5deg); }
 }
 
+}
+
+/* ============================================================
+   Ambient motion (driven by components/MotionFX.tsx)
+
+   Everything here moves through the individual `translate` property, never
+   `transform`, so it stacks on top of the idle keyframes above instead of
+   replacing them. `--px`/`--py` are parallax offsets written every frame;
+   `--ry` is the reveal offset, registered so it can transition on its own
+   while the parallax keeps updating underneath without any lag.
+   ============================================================ */
+
+@property --ry {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+[data-depth],
+[data-reveal] {
+  translate: var(--px, 0px) calc(var(--py, 0px) + var(--ry, 0px));
+}
+
+/* `.fx` is only added once MotionFX is running, so without JS nothing is
+   ever left hidden. */
+.fx [data-reveal] {
+  transition:
+    --ry 1.1s var(--ease-entrance) var(--reveal-delay, 0ms),
+    opacity 0.9s var(--ease-entrance) var(--reveal-delay, 0ms);
+}
+.fx [data-reveal]:not(.is-in) {
+  --ry: 2.4vw;
+  opacity: 0;
 }
 
 /* ============================================================

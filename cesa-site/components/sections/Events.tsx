@@ -79,6 +79,7 @@ export default function Events() {
         <img
           src="/home/doodle-memories.webp"
           alt="Collecting memories, not just certificates"
+          data-depth="1.2"
           className="idle-wiggle absolute origin-top object-contain"
           style={{ ...box(13, 9, 228, 342), ["--dur" as string]: "6s" }}
         />
@@ -88,22 +89,25 @@ export default function Events() {
         <img
           src="/home/doodle-build.webp"
           alt="Build, learn, share, repeat"
+          data-depth="0.9"
           className="idle-wiggle absolute origin-top object-contain"
           style={{ ...box(1705, 31, 199, 297), ["--dur" as string]: "7.2s", ["--delay" as string]: "-2.5s" }}
         />
       </picture>
 
-      <span aria-hidden="true" className="absolute bg-black" style={box(424, 164, 197, 7)} />
+      <span aria-hidden="true" data-reveal className="absolute bg-black" style={{ ...box(424, 164, 197, 7), ["--reveal-delay" as string]: "120ms" }} />
       <h2
+        data-reveal
         className="absolute whitespace-nowrap font-machine font-normal leading-none text-black"
         style={{ ...box(641, 113, 683, 114), fontSize: vw(92) }}
       >
         EVENTS &amp; PROJECTS
       </h2>
-      <span aria-hidden="true" className="absolute bg-black" style={box(1296, 163, 197, 7)} />
+      <span aria-hidden="true" data-reveal className="absolute bg-black" style={{ ...box(1296, 163, 197, 7), ["--reveal-delay" as string]: "120ms" }} />
       <p
+        data-reveal
         className="absolute whitespace-nowrap font-segoe text-black"
-        style={{ ...box(633, 204, 708, 45), fontSize: vw(37) }}
+        style={{ ...box(633, 204, 708, 45), fontSize: vw(37), ["--reveal-delay" as string]: "200ms" }}
       >
         Moments that make the journey special.
       </p>
@@ -118,8 +122,10 @@ export default function Events() {
           // the inner layer, since both would otherwise fight over `transform`.
           <figure
             key={card.caption}
+            data-reveal
             className="idle-float absolute m-0"
             style={{
+              ["--reveal-delay" as string]: `${280 + i * 140}ms`,
               ...box(fx, fy, 530, 354),
               ["--dur" as string]: `${6.5 + i * 0.9}s`,
               ["--delay" as string]: `${-i * 1.7}s`,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Inter, Jaini, JetBrains_Mono, Patrick_Hand } from "next/font/google";
 
+import MotionFX from "@/components/MotionFX";
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
@@ -110,6 +111,7 @@ export default function RootLayout({
     >
       <body>
         <SmoothScroll>{children}</SmoothScroll>
+        <MotionFX />
       </body>
     </html>
   );

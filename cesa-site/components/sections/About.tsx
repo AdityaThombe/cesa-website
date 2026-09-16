@@ -63,8 +63,9 @@ export default function About() {
           src="/home/doodle-computer.webp"
           alt=""
           aria-hidden="true"
-          className="idle-bob pointer-events-none absolute object-contain"
-          style={{ ...box(-58, 668, 398, 265), ["--dur" as string]: "5.5s" }}
+          data-depth="1.4"
+          className="idle-rock pointer-events-none absolute object-contain"
+          style={{ ...box(-58, 668, 398, 265), ["--dur" as string]: "6.5s" }}
         />
       </picture>
 
@@ -97,6 +98,7 @@ export default function About() {
         </div>
 
         <h2
+          data-reveal
           className="absolute whitespace-nowrap font-machine font-normal leading-none text-[#4c2d12]"
           style={{ ...box(463, 98, 446, 132), fontSize: vw(128) }}
         >
@@ -104,8 +106,9 @@ export default function About() {
         </h2>
 
         <p
+          data-reveal
           className="absolute text-center font-jaini text-[#371903]"
-          style={{ ...box(217, 267, 975, 436), fontSize: vw(40), lineHeight: vw(70), letterSpacing: vw(2) }}
+          style={{ ...box(217, 267, 975, 436), ["--reveal-delay" as string]: "180ms", fontSize: vw(40), lineHeight: vw(70), letterSpacing: vw(2) }}
         >
           CESA is the official student body of the Computer Engineering Department at
           VIT. We empower students to learn, innovate, and collaborate through coding
@@ -121,6 +124,7 @@ export default function About() {
           src="/home/doodle-plane.webp"
           alt=""
           aria-hidden="true"
+          data-depth="1.8"
           className="idle-drift pointer-events-none absolute z-10 object-contain"
           style={box(1569, 886, 400, 267)}
         />
@@ -128,7 +132,7 @@ export default function About() {
 
       {/* Bulb (58:128): the box is the rotated node's bounds; the image is
           its own 230.9x247.1 turned 13.27deg inside it. */}
-      <div aria-hidden="true" className="idle-swing pointer-events-none absolute z-10 flex items-center justify-center" style={{ ...box(1639, 105, 281.456, 293.5), ["--dur" as string]: "4.6s" }}>
+      <div aria-hidden="true" data-depth="1.1" className="idle-swing pointer-events-none absolute z-10 flex items-center justify-center" style={{ ...box(1639, 105, 281.456, 293.5), ["--dur" as string]: "4.6s" }}>
         <picture>
           <source srcSet="/home/doodle-bulb.avif" type="image/avif" />
           <img
